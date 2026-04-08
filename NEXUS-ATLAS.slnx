@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/NEXUS-ATLAS/NEXUS-ATLAS.fsproj" />
+  </Folder>
+</Solution>
