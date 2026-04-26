@@ -209,11 +209,32 @@ The boundary matters for FORGE: only domain events enter the event stream and ge
 
 ## Narrow Blueprint Pattern
 
-Some systems have a single dominant event that feeds the majority of read models. LaundryLog is an example: almost every projection (recent expenses, session total, monthly summary, location breakdown) derives from `LaundryExpenseLogged` alone.
+Some systems have a single dominant event that feeds the majority of read models. LaundryLog is an example: almost every projection (recent expenses, session total, monthly summary, location breakdown) derives from `MachineRunLogged` alone, with `SuppliesPurchased` as a secondary business event with a different shape.
 
-The supporting events (location management, session lifecycle, settings) are infrastructure around the single core loop. In Adam's visual, most columns on the board are VIEW slices projecting off that one core event in different shapes for different actors and contexts.
+The supporting events (location management, session lifecycle, settings) are infrastructure around the two core loop events. In Adam's visual, most columns on the board are VIEW slices projecting off those core events in different shapes for different actors and contexts.
 
-This is the **narrow blueprint pattern**: one main command slice, many read-model projections, sparse supporting infrastructure. Recognising this shape early keeps the model honest — it resists over-engineering supporting events before they are needed.
+This is the **narrow blueprint pattern**: a small number of command slices, many read-model projections, sparse supporting infrastructure. Recognising this shape early keeps the model honest — it resists over-engineering supporting events before they are needed.
+
+## Physical Records Reveal the Event Model
+
+The structure of a physical record (notebook, paper form, ledger) often directly encodes the correct event model. LaundryLog example:
+
+- The **date + location header row** in the driver's notebook is a `VisitStarted` event — the anchor fact that all line items belong to.
+- The **indented line item rows** are `MachineRunLogged` or `SuppliesPurchased` events, each with a distinct field shape.
+
+The notebook's two-level hierarchy maps to exactly two levels in the event model. The record-keeper already knew the right granularity; the modeler's job is to read it.
+
+Corollary: when payment method varies per line item in the notebook (same visit, three different methods), it belongs on the line item event — not on the visit anchor. Adam's principle: model what actually happened, not what is convenient.
+
+## LaundryLog Core Event Structure
+
+Three events cover the entire business:
+
+- `VisitStarted` — date, location (name, city, state, identifier); the grouping anchor
+- `MachineRunLogged` — visitId, machineType (WASHER/DRYER), quantity, unitPrice, total, paymentMethod; the dominant business event
+- `SuppliesPurchased` — visitId, amount, paymentMethod, description; structurally different (no qty×price), warrants a distinct event
+
+Everything else — totals, location breakdowns, payment method breakdowns — is a read model projecting off these three. Location management (`LocationAdded`, etc.) is supporting infrastructure. `paymentMethod` lives on the line item events because the notebook confirms it varies within a single visit.
 
 ## Promotion Candidates → NEXUS-LOGOS
 
