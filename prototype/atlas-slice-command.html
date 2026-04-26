@@ -47,6 +47,7 @@
   /* Column geometry */
   --col-w:          292px;
   --actor-col-w:    40px;
+  --swim-lane-h:    126px;   /* shared height for every swimlane row above INTERFACE */
   --col-radius:     24px;
   --col-border-w:   4px;
   --col-pad:        10px;
@@ -172,13 +173,13 @@ body {
      the CSS Grid grammar allows only one <line-names> at each track boundary.
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
-    [header-start]         auto [header-end        driver-start]
-    auto [driver-end        restapi-start]
-    auto [restapi-end       interface-start]
-    auto [interface-end     system-start]
-    auto [system-end        entities-start]
-    auto [entities-end      gwt-start]
-    auto [gwt-end];
+    [header-start]              auto              [header-end        driver-start]
+    var(--swim-lane-h)                            [driver-end        restapi-start]
+    var(--swim-lane-h)                            [restapi-end       interface-start]
+    auto                                          [interface-end     system-start]
+    auto                                          [system-end        entities-start]
+    auto                                          [entities-end      gwt-start]
+    auto                                          [gwt-end];
 
   column-gap: var(--col-gap);
 
