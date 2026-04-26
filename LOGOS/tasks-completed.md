@@ -23,3 +23,5 @@
 - [x] `atlas-column-gallery.html` — DRIVER and RESTAPI swimlane heights equalized to 126px each via shared `--swim-lane-h` CSS token; terminal block anchored to top of RESTAPI zone; both rows adjust together by changing the single token
 - [x] `atlas-column-gallery.html` — actor swimlane color differentiation: DRIVER → blue tint, RestAPI → purple (label rendered as mixed-case `RestAPI`), CLI → dark slate; each lane now has a visually distinct colour and border
 - [x] `atlas-column-gallery.html` — zone tinting inside slice cards: each zone within a card carries its swimlane tint (blue=DRIVER, purple=RestAPI, slate=CLI, light grey=SYSTEM), matching actor column labels exactly, driven by shared `--swim-*-bg` CSS variables
+- [x] `atlas-column-gallery.html` — card border z-index fix: slice card border now renders above zone background tints (visible cleanly at INTERFACE and SYSTEM rows); zone backgrounds no longer bleed over card outlines
+- [x] `atlas-column-gallery.html` — RestAPI swimlane color changed from purple to teal; clearly distinct from blue DRIVER row; all four swimlane colours (blue, teal, slate, light grey) are visually unambiguous
