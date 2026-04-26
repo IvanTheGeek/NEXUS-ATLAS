@@ -285,6 +285,22 @@ body {
   flex-direction: column;
   gap: 5px;
 }
+.atlas-col__header--command {
+  background: var(--cmd-header);
+  border-radius: calc(var(--col-radius) - var(--col-border-w)) calc(var(--col-radius) - var(--col-border-w)) 0 0;
+  padding: 7px var(--col-pad);
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+}
+.atlas-col__header--command .col-kind-label {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
 
 /* Column name label — floats above the card, outside zone-bg */
 .atlas-col__colname {
@@ -1314,18 +1330,9 @@ body {
           <span class="col-slice-num">01</span>
         </div>
 
-        <!-- Zone 1: Header — classification badges only -->
-        <div class="atlas-col__header">
-          <div class="col-class-row">
-            <div class="col-badges">
-              <span class="badge badge--group">Business</span>
-              <span class="badge badge--context">Domain</span>
-            </div>
-            <span class="badge badge--kind badge--kind-command">COMMAND</span>
-          </div>
-          <div class="col-badges">
-            <span class="badge badge--lens">AEM</span>
-          </div>
+        <!-- Zone 1: Header — slice kind -->
+        <div class="atlas-col__header atlas-col__header--command">
+          <span class="col-kind-label">Command</span>
         </div>
 
         <!-- Zone 2a: DRIVER mobile sub-lane -->

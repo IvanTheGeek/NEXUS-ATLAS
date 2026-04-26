@@ -2,6 +2,23 @@
 
 > Unresolved design questions and things needing a decision before work can proceed.
 
+## Slice Concern Taxonomy
+
+**Is Automation a concern layer or only an interaction pattern?**
+The Automation interaction pattern (Event(s) → Processor → Command(s)) is clearly distinct from Behavior and Translation. But should it also appear as a *concern layer* alongside Business? If Automation is folded into Business, FORGE loses the signal it needs to generate a processor rather than a handler. If it's a separate layer, does it conflict with the Interaction Pattern axis — are two different axes capturing the same distinction?
+Decision needed before finalising slice metadata schema.
+
+**Is UX a concern layer, or an attribute/quality of a PATH?**
+UX interaction slices (form validation feedback, gesture responses) could be modeled as a concern layer on individual slices. But UX could equally be a property of how Business/Runtime/UI slices are sequenced and designed within a PATH, not a layer on a single slice. If UX is a cross-cut rather than a layer, it belongs in PATH annotations, not slice classification.
+Decision needed before updating column classification badge treatment.
+
+**Are Lifecycle and Runtime distinct enough to warrant separation?**
+Lifecycle = process-level events (AppStarted, AppSuspended). Runtime = application framework events (RouteResolved, DI wiring). For FORGE they are distinct (Lifecycle drives platform integration code; Runtime drives app framework layer). For ATLAS they may both render in the same "System" swimlane. Worth deciding whether ATLAS needs to distinguish them or can treat them as one concern zone.
+
+**Domain / App / SubDomain hierarchy and relativity**
+The same concept can be a Domain for one application and a SubDomain within another application's Domain. ExpenseTracking is a top-level Domain for LaundryLog but a SubDomain inside CheddarBooks' Bookkeeping Domain. How does the model represent this relativity? Are Domain/SubDomain absolute names in a global hierarchy, or relative to the App in scope?
+Decision needed before finalizing the 7-axis slice metadata schema.
+
 ## Classification System
 
 **Domain / Context / Lens — badge visual treatment**
