@@ -181,8 +181,9 @@ body {
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
     [colname-start]             auto              [colname-end       header-start]
-    auto                                          [header-end        driver-start]
-    var(--swim-lane-h)                            [driver-end        admin-start]
+    auto                                          [header-end        driver-start driver-mobile-start]
+    var(--swim-lane-h)                            [driver-mobile-end driver-desktop-start]
+    var(--swim-lane-h)                            [driver-desktop-end driver-end admin-start]
     var(--swim-lane-h)                            [admin-end         restapi-start]
     var(--swim-lane-h)                            [restapi-end       cli-start]
     var(--swim-lane-h)                            [cli-end           interface-start]
@@ -313,9 +314,9 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* Zone 2 — DRIVER row: screen thumbnail */
-.atlas-col__driver {
-  grid-row: driver-start / driver-end;
+/* Zone 2a — DRIVER mobile sub-lane */
+.atlas-col__driver-mobile {
+  grid-row: driver-mobile-start / driver-mobile-end;
   grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-driver-bg);
@@ -323,6 +324,109 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+}
+
+/* Zone 2b — DRIVER desktop sub-lane */
+.atlas-col__driver-desktop {
+  grid-row: driver-desktop-start / driver-desktop-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-driver-bg);
+  border-top: 1px solid rgba(147, 197, 253, 0.40);
+  padding: 4px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ── LaundryLog desktop thumbnail ──────────────────────────────────────────── */
+.thumb--desktop-ll .thumb__device {
+  width: 152px;
+  border-radius: 5px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(15,23,42,0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.thumb--desktop-ll:hover .thumb__device { box-shadow: 0 5px 14px rgba(15,23,42,0.22); }
+.thumb__ll-nav {
+  height: 9px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.thumb__ll-nav-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.20);
+}
+.thumb__ll-nav-title {
+  flex: 1;
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(0,0,0,0.18);
+  margin: 0 4px;
+}
+.thumb__ll-nav-icon {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.18);
+}
+.thumb__ll-body {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  background: #f1f5f9;
+  padding: 2px;
+}
+.thumb__ll-sidebar {
+  width: 34px;
+  background: #1e293b;
+  border-radius: 2px;
+  padding: 3px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.thumb__ll-entry {
+  height: 8px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.12);
+}
+.thumb__ll-entry--active { background: rgba(251,191,36,0.55); }
+.thumb__ll-main {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__ll-field {
+  height: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  background: #f8fafc;
+}
+.thumb__ll-select-row {
+  display: flex;
+  gap: 2px;
+}
+.thumb__ll-select {
+  flex: 1;
+  height: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  background: #fff7ed;
+  border-color: #fdba74;
 }
 
 /* Zone 3 — SYSTEM row: empty for command slices; automation/reactor content for other types */
@@ -691,10 +795,17 @@ body {
   justify-content: center;
 }
 
-.actor-lane--driver {
-  grid-row: driver-start / driver-end;
+.actor-lane--driver-mobile {
+  grid-row: driver-mobile-start / driver-mobile-end;
   background: var(--swim-driver-bg);
   border-right: 2px solid #93c5fd;
+}
+
+.actor-lane--driver-desktop {
+  grid-row: driver-desktop-start / driver-desktop-end;
+  background: var(--swim-driver-bg);
+  border-right: 2px solid #93c5fd;
+  border-top: 1px solid rgba(147, 197, 253, 0.55);
 }
 
 .actor-lane--admin {
@@ -729,7 +840,8 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.actor-lane--driver  .actor-lane__label { color: #1e40af; }
+.actor-lane--driver-mobile  .actor-lane__label { color: #1e40af; }
+.actor-lane--driver-desktop .actor-lane__label { color: #1e40af; }
 .actor-lane--admin   .actor-lane__label { color: #92400e; }
 .actor-lane--restapi .actor-lane__label { color: #0f766e; text-transform: none; letter-spacing: 0.06em; }
 .actor-lane--cli     .actor-lane__label { color: #334155; }
@@ -1115,8 +1227,11 @@ body {
 
       <!-- Actor column — grid col 1, sticky on horizontal scroll ─────────── -->
       <div class="actor-bg" aria-hidden="true"></div>
-      <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
-        <span class="actor-lane__label">Driver</span>
+      <div class="actor-lane actor-lane--driver-mobile" aria-label="Mobile driver swimlane">
+        <span class="actor-lane__label">Mobile</span>
+      </div>
+      <div class="actor-lane actor-lane--driver-desktop" aria-label="Desktop driver swimlane">
+        <span class="actor-lane__label">Desktop</span>
       </div>
       <div class="actor-lane actor-lane--admin" aria-label="Admin swimlane">
         <span class="actor-lane__label">ADMIN</span>
@@ -1161,8 +1276,8 @@ body {
           </div>
         </div>
 
-        <!-- Zone 2: DRIVER row — screen thumbnail -->
-        <div class="atlas-col__driver">
+        <!-- Zone 2a: DRIVER mobile sub-lane -->
+        <div class="atlas-col__driver-mobile">
           <div class="thumb">
             <div class="thumb__device">
               <div class="thumb__notch"></div>
@@ -1185,6 +1300,40 @@ body {
                     <div class="thumb__chip"></div>
                   </div>
                   <div class="thumb__btn thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <!-- Zone 2b: DRIVER desktop sub-lane — LaundryLog desktop view -->
+        <div class="atlas-col__driver-desktop">
+          <div class="thumb thumb--desktop-ll">
+            <div class="thumb__device">
+              <div class="thumb__ll-nav">
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-title"></div>
+                <div class="thumb__ll-nav-icon"></div>
+              </div>
+              <div class="thumb__ll-body">
+                <div class="thumb__ll-sidebar">
+                  <div class="thumb__ll-entry thumb__ll-entry--active"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                </div>
+                <div class="thumb__ll-main">
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-select-row">
+                    <div class="thumb__ll-select"></div>
+                    <div class="thumb__ll-select"></div>
+                  </div>
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-field"></div>
                 </div>
               </div>
             </div>
@@ -1381,7 +1530,7 @@ body {
           </div>
         </div>
 
-        <div class="atlas-col__driver">
+        <div class="atlas-col__driver-mobile">
           <div class="thumb">
             <div class="thumb__device">
               <div class="thumb__notch"></div>
@@ -1404,6 +1553,39 @@ body {
                     <div class="thumb__chip"></div>
                   </div>
                   <div class="thumb__btn thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver-desktop">
+          <div class="thumb thumb--desktop-ll">
+            <div class="thumb__device">
+              <div class="thumb__ll-nav">
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-title"></div>
+                <div class="thumb__ll-nav-icon"></div>
+              </div>
+              <div class="thumb__ll-body">
+                <div class="thumb__ll-sidebar">
+                  <div class="thumb__ll-entry thumb__ll-entry--active"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                </div>
+                <div class="thumb__ll-main">
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-select-row">
+                    <div class="thumb__ll-select"></div>
+                    <div class="thumb__ll-select"></div>
+                  </div>
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-field"></div>
                 </div>
               </div>
             </div>
