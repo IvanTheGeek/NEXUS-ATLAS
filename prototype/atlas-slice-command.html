@@ -46,6 +46,7 @@
 
   /* Swimlane colours — shared by actor lanes, zone backgrounds, and lane bands */
   --swim-driver-bg:  rgba(59,  130, 246, 0.14);
+  --swim-admin-bg:   rgba(245, 158, 11,  0.13);   /* amber — admin/dashboard */
   --swim-restapi-bg: rgba(13,  148, 136, 0.16);   /* teal-600 — distinct from blue */
   --swim-cli-bg:     rgba(30,  41,  59,  0.08);
   --swim-system-bg:  rgba(248, 250, 252, 0.80);
@@ -180,7 +181,8 @@ body {
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
     [header-start]              auto              [header-end        driver-start]
-    var(--swim-lane-h)                            [driver-end        restapi-start]
+    var(--swim-lane-h)                            [driver-end        admin-start]
+    var(--swim-lane-h)                            [admin-end         restapi-start]
     var(--swim-lane-h)                            [restapi-end       cli-start]
     var(--swim-lane-h)                            [cli-end           interface-start]
     auto                                          [interface-end     system-start]
@@ -306,6 +308,176 @@ body {
   gap: 6px;
 }
 
+/* Zone 2a — ADMIN row */
+.atlas-col__admin {
+  grid-row: admin-start / admin-end;
+  grid-column: 2;
+  z-index: 1;
+  background: var(--swim-admin-bg);
+  padding: 4px var(--col-pad) 6px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ── Desktop / dashboard thumbnail ─────────────────────────────────────────── */
+.thumb--desktop .thumb__device {
+  width: 152px;
+  border-radius: 5px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(15,23,42,0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.thumb--desktop:hover .thumb__device { box-shadow: 0 5px 14px rgba(15,23,42,0.22); }
+
+.thumb__titlebar {
+  height: 8px;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.thumb__titlebar-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+}
+.thumb__titlebar-dot--red    { background: #f87171; }
+.thumb__titlebar-dot--yellow { background: #fbbf24; }
+.thumb__titlebar-dot--green  { background: #4ade80; }
+
+.thumb__dash-nav {
+  height: 9px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.thumb__dash-nav-item {
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.22);
+}
+.thumb__dash-nav-item--active { background: #f59e0b; width: 18px; }
+.thumb__dash-nav-item--sm     { width: 12px; }
+.thumb__dash-nav-item--xs     { width: 9px; }
+.thumb__dash-nav-spacer { flex: 1; }
+.thumb__dash-nav-avatar {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.40);
+}
+
+.thumb__dash-body {
+  flex: 1;
+  background: #f1f5f9;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.thumb__dash-kpis {
+  display: flex;
+  gap: 2px;
+}
+.thumb__dash-kpi {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 2px 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.thumb__dash-kpi-val {
+  height: 7px;
+  border-radius: 1px;
+  width: 55%;
+}
+.thumb__dash-kpi-val--a { background: #3b82f6; }
+.thumb__dash-kpi-val--b { background: #f59e0b; }
+.thumb__dash-kpi-val--c { background: #10b981; }
+.thumb__dash-kpi-val--d { background: #ef4444; }
+.thumb__dash-kpi-lbl {
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 1px;
+  width: 80%;
+}
+
+.thumb__dash-main {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+}
+.thumb__dash-chart {
+  flex: 2;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 3px 3px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__dash-chart-bars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 0 1px;
+}
+.thumb__dash-chart-bar {
+  flex: 1;
+  border-radius: 1px 1px 0 0;
+  background: #3b82f6;
+}
+.thumb__dash-chart-bar--hi  { background: #f59e0b; }
+.thumb__dash-chart-bar--mid { background: #60a5fa; }
+.thumb__dash-chart-axis {
+  height: 1px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.thumb__dash-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__dash-row {
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  height: 10px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.thumb__dash-row-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.thumb__dash-row-dot--ok  { background: #4ade80; }
+.thumb__dash-row-dot--warn{ background: #fbbf24; }
+.thumb__dash-row-dot--err { background: #f87171; }
+.thumb__dash-row-line {
+  flex: 1; height: 3px;
+  background: #e2e8f0;
+  border-radius: 1px;
+}
+
 /* Zone 2b — REST API row */
 .atlas-col__restapi {
   grid-row: restapi-start / restapi-end;
@@ -411,6 +583,7 @@ body {
   pointer-events: none;
 }
 .lane-band--driver  { grid-row: driver-start  / driver-end;  background: var(--swim-driver-bg);  }
+.lane-band--admin   { grid-row: admin-start   / admin-end;   background: var(--swim-admin-bg);   }
 .lane-band--restapi { grid-row: restapi-start / restapi-end; background: var(--swim-restapi-bg); }
 .lane-band--cli     { grid-row: cli-start     / cli-end;     background: var(--swim-cli-bg);     }
 .lane-band--system  { grid-row: system-start  / system-end;  background: var(--swim-system-bg);  }
@@ -489,6 +662,12 @@ body {
   border-right: 2px solid #93c5fd;
 }
 
+.actor-lane--admin {
+  grid-row: admin-start / admin-end;
+  background: var(--swim-admin-bg);
+  border-right: 2px solid #fcd34d;
+}
+
 .actor-lane--restapi {
   grid-row: restapi-start / restapi-end;
   background: var(--swim-restapi-bg);
@@ -516,6 +695,7 @@ body {
   text-transform: uppercase;
 }
 .actor-lane--driver  .actor-lane__label { color: #1e40af; }
+.actor-lane--admin   .actor-lane__label { color: #92400e; }
 .actor-lane--restapi .actor-lane__label { color: #0f766e; text-transform: none; letter-spacing: 0.06em; }
 .actor-lane--cli     .actor-lane__label { color: #334155; }
 .actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
@@ -812,6 +992,7 @@ body {
       <!-- Lane bands — first in source order so they paint behind everything.
            Span all columns; visible in the column-gap between cards. ───────── -->
       <div class="lane-band lane-band--driver"  aria-hidden="true"></div>
+      <div class="lane-band lane-band--admin"   aria-hidden="true"></div>
       <div class="lane-band lane-band--restapi" aria-hidden="true"></div>
       <div class="lane-band lane-band--cli"     aria-hidden="true"></div>
       <div class="lane-band lane-band--system"  aria-hidden="true"></div>
@@ -820,6 +1001,9 @@ body {
       <div class="actor-bg" aria-hidden="true"></div>
       <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
         <span class="actor-lane__label">Driver</span>
+      </div>
+      <div class="actor-lane actor-lane--admin" aria-label="Admin swimlane">
+        <span class="actor-lane__label">ADMIN</span>
       </div>
       <div class="actor-lane actor-lane--restapi" aria-label="RestAPI swimlane">
         <span class="actor-lane__label">RestAPI</span>
@@ -884,6 +1068,79 @@ body {
               </div>
             </div>
             <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <!-- Zone 2a: ADMIN row — wide desktop dashboard thumbnail -->
+        <div class="atlas-col__admin">
+          <div class="thumb thumb--desktop">
+            <div class="thumb__device">
+              <div class="thumb__titlebar">
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--red"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--yellow"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--green"></div>
+              </div>
+              <div class="thumb__dash-nav">
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--active"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--sm"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--xs"></div>
+                <div class="thumb__dash-nav-spacer"></div>
+                <div class="thumb__dash-nav-avatar"></div>
+              </div>
+              <div class="thumb__dash-body">
+                <div class="thumb__dash-kpis">
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--a"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--b"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--c"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--d"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                </div>
+                <div class="thumb__dash-main">
+                  <div class="thumb__dash-chart">
+                    <div class="thumb__dash-chart-bars">
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:45%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:70%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:90%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:55%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:80%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:60%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:75%"></div>
+                    </div>
+                    <div class="thumb__dash-chart-axis"></div>
+                  </div>
+                  <div class="thumb__dash-sidebar">
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--warn"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--err"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">AdminDashboard</span>
           </div>
         </div>
 
