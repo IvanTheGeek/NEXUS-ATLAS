@@ -154,6 +154,16 @@ failure mode — the column appears not to resize without any console error.
 .sub-lane { display: flex; align-items: center; justify-content: center; min-width: 0; }
 ```
 
+## Command Header: Banner vs. Badge Treatment
+
+The COMMAND zone header can be rendered two ways:
+- **Badge-heavy**: entity name + kind badge + classification badges stacked in the header row
+- **Clean banner**: solid colour fill (`--cmd-header` blue) with only the zone label ("COMMAND") right-aligned, rounded top corners flush with the card
+
+The banner approach moves classification context out of the per-entity header and into the column-level (or swimlane-level) context. This keeps the entity card focused on the entity itself. The side-by-side comparison in `atlas-slice-design-concept.html` (Slice 01 = banner, Slice 02 = badges) is the reference for this decision.
+
+Decision needed: which treatment becomes canonical for COMMAND (and by extension EVENT) zone headers.
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
