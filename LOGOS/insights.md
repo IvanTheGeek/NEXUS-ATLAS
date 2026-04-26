@@ -162,6 +162,7 @@ The VIEW slice type has a distinct visual treatment that mirrors COMMAND but sig
 - **Concern meta**: "Business.Translation" (vs. "Business.Behavior" for commands)
 - **GWT pattern**: Event → Criteria → View (trigger event, filter criteria, projected view result)
   — the read-side analog of COMMAND's Given → When → Then
+- **GWT colour**: Criteria card uses rose header + rose-tinted background; W pill is rose — distinct from the blue W pill used for COMMAND slices
 - **DRIVER thumbnails**: list-style layout showing the projected data screen
 - **Actor rows**: `GET /api/…` for RestAPI, `-q …` for CLI — query conventions vs. `POST` / verb commands
 
