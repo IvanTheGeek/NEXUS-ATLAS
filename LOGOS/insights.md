@@ -180,6 +180,41 @@ The banner approach moves classification context out of the per-entity header an
 
 Decision needed: which treatment becomes canonical for COMMAND (and by extension EVENT) zone headers.
 
+## Adam's Three Swimlane Patterns
+
+Event Modeling distinguishes three distinct swimlane interaction patterns:
+
+1. **Command (human-driven)** — a person issues a command; the system records an event. The human is the trigger.
+2. **View (projection-driven)** — the system projects events into a read model; a person or system queries it. No command is issued by the query.
+3. **Automation (system-driven)** — a read model threshold or clock triggers a command with no human actor. The system is the trigger.
+
+These are structurally distinct: Automation is a read-model → command chain driven by the system, not by a human gesture. It is the third swimlane in Adam's visual, explicitly separate from the human-driven Command lane.
+
+In ATLAS terms, the Automation pattern's actor is a Clock or Processor (not a person). The swimlane is the carrier of this distinction — which is why the actor column is load-bearing, not decorative.
+
+## Domain Events vs. UI/Form State
+
+Not every state change that affects the UI is a domain event. The test:
+
+- **Domain event** — something the system needs to remember across sessions; a durable fact that read models project from.
+- **Form/UI state** — ephemeral selection or input that only matters for the duration of a form interaction. It is a field on the command that eventually fires, not an event in its own right.
+
+Examples for LaundryLog:
+- `MachineTypeSelected` → NOT an event; it is the `machineType` field on `LaundryExpenseLogged`
+- `PriceEntered`, `QuantityChanged` → NOT events; form step state
+- `ViewedExpenseHistory` → NOT an event; read model queries do not produce events
+- `LaundryExpenseLogged` → IS an event; the system needs this fact to build every projection
+
+The boundary matters for FORGE: only domain events enter the event stream and get persisted.
+
+## Narrow Blueprint Pattern
+
+Some systems have a single dominant event that feeds the majority of read models. LaundryLog is an example: almost every projection (recent expenses, session total, monthly summary, location breakdown) derives from `LaundryExpenseLogged` alone.
+
+The supporting events (location management, session lifecycle, settings) are infrastructure around the single core loop. In Adam's visual, most columns on the board are VIEW slices projecting off that one core event in different shapes for different actors and contexts.
+
+This is the **narrow blueprint pattern**: one main command slice, many read-model projections, sparse supporting infrastructure. Recognising this shape early keeps the model honest — it resists over-engineering supporting events before they are needed.
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
