@@ -154,6 +154,21 @@ failure mode — the column appears not to resize without any console error.
 .sub-lane { display: flex; align-items: center; justify-content: center; min-width: 0; }
 ```
 
+## VIEW Slice: Read-Side Design Conventions
+
+The VIEW slice type has a distinct visual treatment that mirrors COMMAND but signals read-side semantics:
+
+- **Banner colour**: green (vs. blue for COMMAND) — visually distinct at a glance
+- **Concern meta**: "Business.Translation" (vs. "Business.Behavior" for commands)
+- **GWT pattern**: Event → Criteria → View (trigger event, filter criteria, projected view result)
+  — the read-side analog of COMMAND's Given → When → Then
+- **DRIVER thumbnails**: list-style layout showing the projected data screen
+- **Actor rows**: `GET /api/…` for RestAPI, `-q …` for CLI — query conventions vs. `POST` / verb commands
+
+The banner approach (used for both COMMAND and VIEW) moves classification out of the entity header
+and into the column-level zone label. The colour convention (blue=write, green=read) is now
+established across both slice types in `atlas-slice-design-concept.html`.
+
 ## Command Header: Banner vs. Badge Treatment
 
 The COMMAND zone header can be rendered two ways:
