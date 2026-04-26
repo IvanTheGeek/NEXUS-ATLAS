@@ -173,7 +173,8 @@ body {
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
     [header-start]         auto [header-end        driver-start]
-    auto [driver-end        interface-start]
+    auto [driver-end        restapi-start]
+    auto [restapi-end       interface-start]
     auto [interface-end     system-start]
     auto [system-end        entities-start]
     auto [entities-end      gwt-start]
@@ -284,6 +285,42 @@ body {
   gap: 6px;
 }
 
+/* Zone 2b — REST API row */
+.atlas-col__restapi {
+  grid-row: restapi-start / restapi-end;
+  grid-column: 2;
+  z-index: 1;
+  padding: 6px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Terminal block — dark code-style endpoint display */
+.terminal-block {
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  width: 100%;
+}
+.terminal-method {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: #34d399;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.terminal-path {
+  font-size: var(--t-sm);
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+}
+
 /* System icon — large gear centered in the SYSTEM zone */
 .system-icon {
   display: flex;
@@ -372,6 +409,12 @@ body {
   border-right: 2px solid #bfdbfe;
 }
 
+.actor-lane--restapi {
+  grid-row: restapi-start / restapi-end;
+  background: rgba(238, 242, 255, 0.80);
+  border-right: 2px solid #c7d2fe;
+}
+
 .actor-lane--system {
   grid-row: system-start / system-end;
   background: rgba(248, 250, 252, 0.80);
@@ -386,8 +429,9 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.actor-lane--driver .actor-lane__label { color: #1e3a8a; }
-.actor-lane--system .actor-lane__label { color: var(--atlas-text-3); }
+.actor-lane--driver  .actor-lane__label { color: #1e3a8a; }
+.actor-lane--restapi .actor-lane__label { color: #3730a3; }
+.actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    HEADER INTERNALS
@@ -683,6 +727,9 @@ body {
       <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
         <span class="actor-lane__label">Driver</span>
       </div>
+      <div class="actor-lane actor-lane--restapi" aria-label="RestAPI swimlane">
+        <span class="actor-lane__label">RestAPI</span>
+      </div>
       <div class="actor-lane actor-lane--system" aria-label="System swimlane">
         <span class="actor-lane__label">System</span>
       </div>
@@ -740,6 +787,14 @@ body {
               </div>
             </div>
             <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <!-- Zone 2b: RestAPI row -->
+        <div class="atlas-col__restapi">
+          <div class="terminal-block">
+            <span class="terminal-method">POST</span>
+            <span class="terminal-path">/api/log-expense</span>
           </div>
         </div>
 
