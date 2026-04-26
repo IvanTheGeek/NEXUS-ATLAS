@@ -496,6 +496,48 @@ body {
 .thumb__none-label { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--atlas-text-4); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
+   SHELL CONTROLS
+══════════════════════════════════════════════════════════════════════════════ */
+.shell__controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.shell__ctrl-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+  margin-right: 2px;
+}
+.size-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 30px;
+  padding: 0 7px;
+  border-radius: 6px;
+  border: 1px solid var(--atlas-border-strong);
+  background: var(--atlas-surface);
+  color: var(--atlas-text-2);
+  font-family: var(--font);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 100ms ease;
+}
+.size-btn.is-active {
+  background: var(--atlas-text-1);
+  border-color: var(--atlas-text-1);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
    GWT ZONE
 ══════════════════════════════════════════════════════════════════════════════ */
 .gwt-row {
@@ -527,6 +569,13 @@ body {
     <div class="shell__sep"></div>
     <span class="shell__eyebrow">LaundryLog · PATH1</span>
     <span class="shell__title">Fresh Launch — No Location — First Entry</span>
+    <div class="shell__controls">
+      <span class="shell__ctrl-label">Size</span>
+      <button class="size-btn" data-size="13" type="button">S</button>
+      <button class="size-btn" data-size="16" type="button">M</button>
+      <button class="size-btn" data-size="19" type="button">L</button>
+      <button class="size-btn" data-size="22" type="button">XL</button>
+    </div>
   </header>
 
   <div class="shell__annotation">
@@ -646,6 +695,25 @@ body {
   </main>
 
 </div><!-- /shell -->
+
+<script>
+(function () {
+  const sizeBtns = document.querySelectorAll('.size-btn');
+
+  function applySize(px) {
+    document.documentElement.style.fontSize = px + 'px';
+    sizeBtns.forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.size) === px));
+    localStorage.setItem('atlas-slice-size', px);
+  }
+
+  sizeBtns.forEach(btn => {
+    btn.addEventListener('click', () => applySize(parseInt(btn.dataset.size)));
+  });
+
+  const saved = parseInt(localStorage.getItem('atlas-slice-size')) || 16;
+  applySize(saved);
+})();
+</script>
 
 </body>
 </html>
