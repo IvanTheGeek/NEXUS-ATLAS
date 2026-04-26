@@ -1202,9 +1202,10 @@ body {
   flex-shrink: 0;
   margin-top: 1px;
 }
-.gwt-lbl--g { background: #ffedd5; color: #c2410c; }   /* orange — events */
-.gwt-lbl--w { background: #dbeafe; color: #1d4ed8; }   /* blue  — commands */
-.gwt-lbl--t { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--g        { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--w        { background: #dbeafe; color: #1d4ed8; }   /* blue  — commands */
+.gwt-lbl--t        { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--criteria { background: #ffe4e6; color: #be185d; }   /* rose  — criteria/query */
 .gwt-items {
   display: flex;
   flex-wrap: wrap;
@@ -1245,17 +1246,19 @@ body {
   overflow: hidden;
   width: 100%;
 }
-.gwt-entity--command { background: var(--cmd-bg);  border-color: var(--cmd-border); }
-.gwt-entity--event   { background: var(--evt-bg);  border-color: var(--evt-border); }
-.gwt-entity--view    { background: var(--view-bg); border-color: var(--view-border); }
+.gwt-entity--command  { background: var(--cmd-bg);              border-color: var(--cmd-border); }
+.gwt-entity--event    { background: var(--evt-bg);              border-color: var(--evt-border); }
+.gwt-entity--view     { background: var(--view-bg);             border-color: var(--view-border); }
+.gwt-entity--criteria { background: rgba(244,63,94,0.08);       border-color: #fda4af; }
 .gwt-entity__header {
   padding: 2px 7px;
   display: flex;
   align-items: center;
 }
-.gwt-entity--command .gwt-entity__header { background: var(--cmd-header); }
-.gwt-entity--event   .gwt-entity__header { background: var(--evt-header); }
-.gwt-entity--view    .gwt-entity__header { background: var(--view-header); }
+.gwt-entity--command  .gwt-entity__header { background: var(--cmd-header); }
+.gwt-entity--event    .gwt-entity__header { background: var(--evt-header); }
+.gwt-entity--view     .gwt-entity__header { background: var(--view-header); }
+.gwt-entity--criteria .gwt-entity__header { background: #e11d48; }
 .gwt-entity__type {
   font-size: var(--t-2xs);
   font-weight: 700;
@@ -2000,9 +2003,9 @@ body {
             </div>
 
             <div class="gwt-section">
-              <span class="gwt-lbl gwt-lbl--w">W</span>
+              <span class="gwt-lbl gwt-lbl--criteria">W</span>
               <div class="gwt-items">
-                <div class="gwt-entity gwt-entity--view">
+                <div class="gwt-entity gwt-entity--criteria">
                   <div class="gwt-entity__header"><span class="gwt-entity__type">Criteria</span></div>
                   <div class="gwt-entity__name">RecentExpensesCriteria</div>
                 </div>
