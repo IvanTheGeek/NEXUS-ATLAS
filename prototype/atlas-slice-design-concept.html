@@ -940,24 +940,72 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   GWT ZONE
+   GWT ZONE — condensed inline view
 ══════════════════════════════════════════════════════════════════════════════ */
-.gwt-row {
+.gwt-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 7px;
 }
-.gwt-toggle {
+.gwt-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gwt-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.gwt-lbl {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.gwt-lbl--g { background: #dbeafe; color: #1e40af; }
+.gwt-lbl--w { background: #fef3c7; color: #92400e; }
+.gwt-lbl--t { background: #d1fae5; color: #065f46; }
+.gwt-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex: 1;
+}
+.gwt-event {
+  font-family: var(--mono);
   font-size: var(--t-xs);
-  color: var(--atlas-text-3);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--font);
-  font-weight: 500;
+  color: var(--atlas-text-2);
+  background: rgba(100, 116, 139, 0.08);
+  border: 1px solid var(--atlas-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
 }
-.gwt-toggle:hover { color: var(--atlas-text-2); }
+.gwt-event--given { border-color: #93c5fd; color: #1e40af; background: rgba(59,130,246,0.07); }
+.gwt-event--then  { border-color: #86efac; color: #166534; background: rgba(34,197,94,0.08); }
+.gwt-field {
+  display: inline-flex;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  background: rgba(100, 116, 139, 0.07);
+  border: 1px solid var(--atlas-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.gwt-field-key { color: var(--atlas-text-3); }
+.gwt-field-sep { color: var(--atlas-text-4); margin: 0 1px; }
+.gwt-field-val { color: var(--atlas-text-1); font-weight: 600; }
 
 </style>
 </head>
@@ -1204,11 +1252,53 @@ body {
           </div>
         </div>
 
-        <!-- Zone 5: GWT (collapsed) -->
+        <!-- Zone 5: GWT — condensed inline -->
         <div class="atlas-col__gwt">
-          <div class="gwt-row">
+          <div class="gwt-header">
             <span class="badge badge--status badge--specified">Specified</span>
-            <button class="gwt-toggle" type="button">show GWT ↓</button>
+          </div>
+          <div class="gwt-block">
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items">
+                <span class="gwt-event gwt-event--given">AppOpened</span>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--w">W</span>
+              <div class="gwt-items">
+                <span class="gwt-field">
+                  <span class="gwt-field-key">machineType</span>
+                  <span class="gwt-field-sep">:</span>
+                  <span class="gwt-field-val">Dryer</span>
+                </span>
+                <span class="gwt-field">
+                  <span class="gwt-field-key">quantity</span>
+                  <span class="gwt-field-sep">:</span>
+                  <span class="gwt-field-val">1</span>
+                </span>
+                <span class="gwt-field">
+                  <span class="gwt-field-key">unitPrice</span>
+                  <span class="gwt-field-sep">:</span>
+                  <span class="gwt-field-val">2.50</span>
+                </span>
+                <span class="gwt-field">
+                  <span class="gwt-field-key">payment</span>
+                  <span class="gwt-field-sep">:</span>
+                  <span class="gwt-field-val">Coins</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items">
+                <span class="gwt-event gwt-event--then">LaundryExpenseLogged</span>
+              </div>
+            </div>
+
           </div>
         </div>
 
