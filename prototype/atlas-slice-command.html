@@ -172,10 +172,11 @@ body {
      the CSS Grid grammar allows only one <line-names> at each track boundary.
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
-    [header-start]    auto [header-end    driver-start]
-    auto [driver-end   system-start]
-    auto [system-end   entities-start]
-    auto [entities-end gwt-start]
+    [header-start]         auto [header-end        driver-start]
+    auto [driver-end        interface-start]
+    auto [interface-end     system-start]
+    auto [system-end        entities-start]
+    auto [entities-end      gwt-start]
     auto [gwt-end];
 
   column-gap: var(--col-gap);
@@ -283,6 +284,24 @@ body {
   gap: 6px;
 }
 
+/* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
+.atlas-col__interface {
+  grid-row: interface-start / interface-end;
+  grid-column: 2;
+  z-index: 1;
+  background: #475569;
+  padding: 3px var(--col-pad);
+  display: flex;
+  align-items: center;
+}
+.interface-label {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
 /* Zone 4 — COMMAND / VIEW entities: command or view entity box(es) */
 .atlas-col__entities {
   grid-row: entities-start / entities-end;
@@ -317,7 +336,7 @@ body {
   grid-row: header-start / gwt-end;
   grid-column: 1;
   position: sticky;
-  left: var(--stage-pad);
+  left: 0;
   z-index: 2;
   background: var(--atlas-surface);
   border-right: 2px solid var(--atlas-border-strong);
@@ -326,7 +345,7 @@ body {
 .actor-lane {
   grid-column: 1;
   position: sticky;
-  left: var(--stage-pad);
+  left: 0;
   z-index: 3;
   display: flex;
   align-items: center;
@@ -710,7 +729,12 @@ body {
           </div>
         </div>
 
-        <!-- Zone 3: SYSTEM row — empty for COMMAND slices -->
+        <!-- Zone 3a: INTERFACE divider -->
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <!-- Zone 3b: SYSTEM row — empty for COMMAND slices -->
         <div class="atlas-col__system"></div>
 
         <!-- Zone 4: COMMAND / VIEW entities -->
