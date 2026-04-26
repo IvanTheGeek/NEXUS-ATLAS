@@ -129,6 +129,14 @@ grid-template-rows:
 The silent failure mode makes this particularly hard to diagnose. If a grid layout
 appears to apply no row structure at all, check for adjacent named-line groups first.
 
+## Screenshot Fidelity vs. Bounding Rect Measurement
+
+JPEG compression and scaling in screenshot tools can make correctly-centered elements
+appear misaligned. When a visual inspection raises an alignment concern, verify by reading
+`getBoundingClientRect()` center values rather than trusting the screenshot pixel pattern.
+If `label.center_y === item.center_y` the alignment is correct regardless of how the
+screenshot renders it. Trust measurements over visuals when they disagree.
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
