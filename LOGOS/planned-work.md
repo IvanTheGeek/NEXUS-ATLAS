@@ -23,7 +23,7 @@ Goal: get the design right in HTML/CSS before building in F#. Each prototype pag
 
 ### Additional Prototype Pages
 - [ ] PATH Index page — list of available PATHs, entry point into the viewer
-- [ ] Slice Detail page — full spec view for one slice (fields, all GWT cases, notes)
+- [ ] Slice Detail page — full spec view for one slice (fields, all GWT cases, notes) ← in progress
 - [ ] PATH viewer page — full PATH1 as the real viewer (not gallery)
 
 ## Phase 2 — F# Implementation

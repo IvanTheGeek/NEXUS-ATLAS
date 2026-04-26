@@ -14,3 +14,4 @@
 - [ ] Interface representation in columns — beyond thumbnail placeholder; screen state as first-class
 - [ ] Dark mode for `atlas-column-gallery.html`
 - [ ] Actor swimlane row at top of columns
+- [ ] `atlas-slice-detail.html` — complete full spec view: all fields, all GWT cases, notes sections
