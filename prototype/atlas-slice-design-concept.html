@@ -187,8 +187,9 @@ body {
     var(--swim-lane-h)                            [restapi-end       cli-start]
     var(--swim-lane-h)                            [cli-end           interface-start]
     auto                                          [interface-end     system-start]
-    auto                                          [system-end        entities-start]
-    auto                                          [entities-end      gwt-start]
+    auto                                          [system-end        command-start]
+    auto                                          [command-end       event-start]
+    auto                                          [event-end         gwt-start]
     auto                                          [gwt-end];
 
   column-gap: var(--col-gap);
@@ -635,15 +636,20 @@ body {
   color: rgba(255, 255, 255, 0.65);
 }
 
-/* Zone 4 — COMMAND / VIEW entities: command or view entity box(es) */
-.atlas-col__entities {
-  grid-row: entities-start / entities-end;
+/* Zone 4a — COMMAND entity row */
+.atlas-col__command-entity {
+  grid-row: command-start / command-end;
   grid-column: var(--slice-col, 2);
   z-index: 1;
   padding: 0 var(--col-pad) 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+}
+
+/* Zone 4b — EVENT entity row */
+.atlas-col__event-entity {
+  grid-row: event-start / event-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 0 var(--col-pad) 6px;
 }
 
 /* Zone 5 — GWT (given / when / then) */
@@ -1257,18 +1263,18 @@ body {
           </div>
         </div>
 
-        <!-- Zone 4: COMMAND / VIEW entities -->
-        <div class="atlas-col__entities">
+        <!-- Zone 4a: COMMAND entity -->
+        <div class="atlas-col__command-entity">
           <div class="entity entity--command">
-            <div class="entity__header">
-              <span class="entity__type">Command</span>
-            </div>
+            <div class="entity__header"><span class="entity__type">Command</span></div>
             <div class="entity__name">LogExpense</div>
           </div>
+        </div>
+
+        <!-- Zone 4b: EVENT entity -->
+        <div class="atlas-col__event-entity">
           <div class="entity entity--event">
-            <div class="entity__header">
-              <span class="entity__type">Event</span>
-            </div>
+            <div class="entity__header"><span class="entity__type">Event</span></div>
             <div class="entity__name">LaundryExpenseLogged</div>
           </div>
         </div>
@@ -1457,7 +1463,7 @@ body {
           </div>
         </div>
 
-        <div class="atlas-col__entities">
+        <div class="atlas-col__command-entity">
           <div class="entity entity--command">
             <div class="entity__header"><span class="entity__type">Command</span></div>
             <div class="entity__name">LogExpense</div>
@@ -1468,6 +1474,9 @@ body {
               <li class="entity__field">payment</li>
             </ul>
           </div>
+        </div>
+
+        <div class="atlas-col__event-entity">
           <div class="entity entity--event">
             <div class="entity__header"><span class="entity__type">Event</span></div>
             <div class="entity__name">LaundryExpenseLogged</div>
