@@ -219,12 +219,12 @@ This is the **narrow blueprint pattern**: a small number of command slices, many
 
 The structure of a physical record (notebook, paper form, ledger) often directly encodes the correct event model. LaundryLog example:
 
-- The **date + location header row** in the driver's notebook is a `VisitStarted` event — the anchor fact that all line items belong to.
-- The **indented line item rows** are `MachineRunLogged` or `SuppliesPurchased` events, each with a distinct field shape.
+- The **date + location header row** in the driver's notebook is a *display grouping* — a notation convenience, not a domain fact. It does not map to a `VisitStarted` event.
+- The **indented line item rows** are `WasherExpenseLogged`, `DryerExpenseLogged`, or `SuppliesPurchased` events. Each is fully self-contained: it carries its own date and location.
 
-The notebook's two-level hierarchy maps to exactly two levels in the event model. The record-keeper already knew the right granularity; the modeler's job is to read it.
+The visit grouping becomes a **read model concern**: "give me all line items where date = X and location = Y." No anchor event is needed for this query. The event stream is flat; the grouping is a projection.
 
-Corollary: when payment method varies per line item in the notebook (same visit, three different methods), it belongs on the line item event — not on the visit anchor. Adam's principle: model what actually happened, not what is convenient.
+Corollary: when payment method varies per line item in the notebook (same visit, three different methods), it belongs on the line item event — not on a visit anchor. Adam's principle: model what actually happened, not what is convenient.
 
 ## LaundryLog Core Event Structure
 
