@@ -1006,9 +1006,9 @@ body {
   flex-shrink: 0;
   margin-top: 1px;
 }
-.gwt-lbl--g { background: #dbeafe; color: #1e40af; }
-.gwt-lbl--w { background: #fef3c7; color: #92400e; }
-.gwt-lbl--t { background: #d1fae5; color: #065f46; }
+.gwt-lbl--g { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--w { background: #dbeafe; color: #1d4ed8; }   /* blue  — commands */
+.gwt-lbl--t { background: #ffedd5; color: #c2410c; }   /* orange — events */
 .gwt-items {
   display: flex;
   flex-wrap: wrap;
@@ -1041,6 +1041,39 @@ body {
 .gwt-field-key { color: var(--atlas-text-3); }
 .gwt-field-sep { color: var(--atlas-text-4); margin: 0 1px; }
 .gwt-field-val { color: var(--atlas-text-1); font-weight: 600; }
+
+/* Mini entity cards inside GWT — scaled-down versions of the full entity boxes */
+.gwt-entity {
+  border-radius: 8px;
+  border: 1.5px solid;
+  overflow: hidden;
+  width: 100%;
+}
+.gwt-entity--command { background: var(--cmd-bg);  border-color: var(--cmd-border); }
+.gwt-entity--event   { background: var(--evt-bg);  border-color: var(--evt-border); }
+.gwt-entity__header {
+  padding: 2px 7px;
+  display: flex;
+  align-items: center;
+}
+.gwt-entity--command .gwt-entity__header { background: var(--cmd-header); }
+.gwt-entity--event   .gwt-entity__header { background: var(--evt-header); }
+.gwt-entity__type {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+.gwt-entity__name {
+  padding: 4px 7px;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--atlas-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 </style>
 </head>
@@ -1289,40 +1322,30 @@ body {
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--g">G</span>
               <div class="gwt-items">
-                <span class="gwt-event gwt-event--given">AppOpened</span>
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">AppOpened</div>
+                </div>
               </div>
             </div>
 
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--w">W</span>
               <div class="gwt-items">
-                <span class="gwt-field">
-                  <span class="gwt-field-key">machineType</span>
-                  <span class="gwt-field-sep">:</span>
-                  <span class="gwt-field-val">Dryer</span>
-                </span>
-                <span class="gwt-field">
-                  <span class="gwt-field-key">quantity</span>
-                  <span class="gwt-field-sep">:</span>
-                  <span class="gwt-field-val">1</span>
-                </span>
-                <span class="gwt-field">
-                  <span class="gwt-field-key">unitPrice</span>
-                  <span class="gwt-field-sep">:</span>
-                  <span class="gwt-field-val">2.50</span>
-                </span>
-                <span class="gwt-field">
-                  <span class="gwt-field-key">payment</span>
-                  <span class="gwt-field-sep">:</span>
-                  <span class="gwt-field-val">Coins</span>
-                </span>
+                <div class="gwt-entity gwt-entity--command">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Command</span></div>
+                  <div class="gwt-entity__name">LogExpense</div>
+                </div>
               </div>
             </div>
 
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--t">T</span>
               <div class="gwt-items">
-                <span class="gwt-event gwt-event--then">LaundryExpenseLogged</span>
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
               </div>
             </div>
 
@@ -1495,23 +1518,37 @@ body {
             <span class="badge badge--status badge--specified">Specified</span>
           </div>
           <div class="gwt-block">
+
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--g">G</span>
-              <div class="gwt-items"><span class="gwt-event gwt-event--given">AppOpened</span></div>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">AppOpened</div>
+                </div>
+              </div>
             </div>
+
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--w">W</span>
               <div class="gwt-items">
-                <span class="gwt-field"><span class="gwt-field-key">machineType</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">Dryer</span></span>
-                <span class="gwt-field"><span class="gwt-field-key">quantity</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">1</span></span>
-                <span class="gwt-field"><span class="gwt-field-key">unitPrice</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">2.50</span></span>
-                <span class="gwt-field"><span class="gwt-field-key">payment</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">Coins</span></span>
+                <div class="gwt-entity gwt-entity--command">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Command</span></div>
+                  <div class="gwt-entity__name">LogExpense</div>
+                </div>
               </div>
             </div>
+
             <div class="gwt-section">
               <span class="gwt-lbl gwt-lbl--t">T</span>
-              <div class="gwt-items"><span class="gwt-event gwt-event--then">LaundryExpenseLogged</span></div>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
 
