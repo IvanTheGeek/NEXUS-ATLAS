@@ -14,3 +14,4 @@
 - [x] `atlas-column-gallery.html` — COMMAND badge overflow at XL fixed (flex-wrap + margin-left: auto on kind badge)
 - [x] `logos/` renamed to `LOGOS/` via `git mv` (history preserved)
 - [x] Stop hook configured with two-step sequence: (1) LOGOS maintenance via `claude --print` on transcript stdin, (2) git checkpoint commit+push — docs always committed in sync with code
+- [x] `atlas-column-gallery.html` — CSS Grid zone layout bug fixed: adjacent named line groups `[header-end] [screen-start]` are invalid `<track-list>` syntax; browser silently drops the entire `grid-template-rows` declaration; fix is to merge into `[header-end screen-start]`

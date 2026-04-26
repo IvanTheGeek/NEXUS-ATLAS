@@ -93,6 +93,31 @@ If an exception is thrown in code, either:
 Per Scott Wlaschin / Domain Modeling Made Functional: make invalid states unrepresentable.
 Error flow is not a separate modeling concern — it is a signal of modeling gaps.
 
+## CSS Grid Named Line Syntax: One Group Per Boundary
+
+CSS Grid's `<track-list>` grammar allows exactly one `<line-names>?` token at each track
+boundary. Writing two separate bracket groups at the same position — even on adjacent lines —
+is invalid and causes the browser to silently discard the entire `grid-template-rows`
+declaration with no error in the console:
+
+```css
+/* INVALID — two <line-names> groups at the same boundary */
+grid-template-rows:
+  [header-start] auto
+  [header-end]
+  [screen-start] auto
+  [screen-end];
+
+/* VALID — merge adjacent end/start names into one group */
+grid-template-rows:
+  [header-start] auto
+  [header-end screen-start] auto
+  [screen-end];
+```
+
+The silent failure mode makes this particularly hard to diagnose. If a grid layout
+appears to apply no row structure at all, check for adjacent named-line groups first.
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
