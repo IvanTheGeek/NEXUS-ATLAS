@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS — Command Slice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TOKENS
+   All values from atlas-design-system.html — nothing invented here.
+══════════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Chrome */
+  --atlas-bg:            #eef2f7;
+  --atlas-surface:       #ffffff;
+  --atlas-border:        #dbe5f1;
+  --atlas-border-strong: #c2d4e8;
+  --atlas-text-1:        #0d2440;
+  --atlas-text-2:        #48627f;
+  --atlas-text-3:        #7a96b0;
+  --atlas-text-4:        #a8bfd6;
+
+  /* Entity types */
+  --cmd-bg:      rgba(59, 130, 246, 0.11);
+  --cmd-border:  #93c5fd;
+  --cmd-header:  #1d4ed8;
+  --evt-bg:      rgba(249, 115, 22, 0.12);
+  --evt-border:  #fdba74;
+  --evt-header:  #ea580c;
+  --view-bg:     rgba(34, 197, 94, 0.10);
+  --view-border: #86efac;
+  --view-header: #16a34a;
+
+  /* Context border + tint pairs */
+  --ctx-lifecycle-border: #1e40af;
+  --ctx-lifecycle-tint:   #dbeafe;
+  --ctx-runtime-border:   #0e7490;
+  --ctx-runtime-tint:     #e0f2fe;
+  --ctx-ux-border:        #6d28d9;
+  --ctx-ux-tint:          #ede9fe;
+  --ctx-business-border:  #15263d;
+  --ctx-business-tint:    #f4f6fa;
+
+  /* Swimlane colours — shared by actor lanes, zone backgrounds, and lane bands */
+  --swim-driver-bg:  rgba(59,  130, 246, 0.14);
+  --swim-admin-bg:   rgba(245, 158, 11,  0.13);   /* amber — admin/dashboard */
+  --swim-restapi-bg: rgba(13,  148, 136, 0.16);   /* teal-600 — distinct from blue */
+  --swim-cli-bg:     rgba(30,  41,  59,  0.08);
+  --swim-system-bg:  rgba(248, 250, 252, 0.80);
+
+  /* Column geometry */
+  --col-w:          292px;
+  --actor-col-w:    76px;
+  --swim-lane-h:    126px;   /* shared height for every swimlane row above INTERFACE */
+  --col-radius:     24px;
+  --col-border-w:   4px;
+  --col-pad:        10px;
+  --col-gap:        18px;
+  --stage-pad:      24px;
+  --box-radius:   14px;
+  --pill-r:       999px;
+  --tag-r:        4px;
+  --col-shadow:   0 10px 24px rgba(10, 27, 49, 0.10);
+
+  /* Component typography (dense — fixed, does not scale with page text size) */
+  --font: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", monospace;
+  --t-2xs:  0.50rem;
+  --t-xs:   0.56rem;
+  --t-sm:   0.64rem;
+  --t-base: 0.72rem;
+  --t-md:   0.84rem;
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--atlas-bg);
+  color: var(--atlas-text-1);
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SHELL
+══════════════════════════════════════════════════════════════════════════════ */
+.shell {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 100vh;
+}
+
+.shell__header {
+  background: var(--atlas-surface);
+  border-bottom: 1px solid var(--atlas-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.shell__wordmark {
+  font-size: var(--t-md);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--atlas-text-1);
+}
+.shell__sep {
+  width: 1px;
+  height: 18px;
+  background: var(--atlas-border-strong);
+  flex-shrink: 0;
+}
+.shell__eyebrow {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+}
+.shell__title {
+  font-size: var(--t-base);
+  font-weight: 700;
+  color: var(--atlas-text-1);
+}
+
+.shell__annotation {
+  background: #fffbeb;
+  border-bottom: 1px solid #fde68a;
+  padding: 7px 20px;
+  font-size: var(--t-sm);
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   STAGE
+══════════════════════════════════════════════════════════════════════════════ */
+.stage {
+  padding: var(--stage-pad);
+  overflow: auto;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   FLOW — THE GRID
+   ─────────────────────────────────────────────────────────────────────────────
+   Layout model:
+     • Columns  = slices (one grid column per slice)
+     • Rows     = content zones (shared across all slices in the PATH)
+
+   Because all slices share the same row tracks, the same zone in every column
+   always aligns to the same vertical position. Row height is the maximum of all
+   cells in that row across the entire PATH — the tallest column drives the row.
+
+   Current zones:
+     header   — classification badges, step number, title, description
+     screen   — screen thumbnail (empty cell for system-internal slices)
+     command  — command entity box(es)
+     event    — event entity box(es)  [variable — will expand to multiple rows]
+     gwt      — given / when / then
+
+   Future zones to add:
+     actor    — actor swimlane row(s), above header or below it
+     view     — view entity box(es), for VIEW slices
+══════════════════════════════════════════════════════════════════════════════ */
+.atlas-flow {
+  display: grid;
+
+  /* Column 1: actor swimlane column (fixed width, always sticky).
+     Column 2+: slice columns (--col-w each).
+     grid-auto-columns handles slices beyond the explicit template. */
+  grid-template-columns: var(--actor-col-w) repeat(2, var(--col-w));
+  grid-auto-columns: var(--col-w);
+
+  /* Named row zones.
+     Each adjacent pair of end/start names must be in ONE bracket group —
+     the CSS Grid grammar allows only one <line-names> at each track boundary.
+     [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
+  grid-template-rows:
+    [colname-start]             auto              [colname-end       header-start]
+    auto                                          [header-end        driver-start driver-mobile-start]
+    var(--swim-lane-h)                            [driver-mobile-end driver-desktop-start]
+    var(--swim-lane-h)                            [driver-desktop-end driver-end admin-start]
+    var(--swim-lane-h)                            [admin-end         restapi-start]
+    var(--swim-lane-h)                            [restapi-end       cli-start]
+    var(--swim-lane-h)                            [cli-end           interface-start]
+    auto                                          [interface-end     system-start]
+    auto                                          [system-end        command-start]
+    auto                                          [command-end       event-start]
+    auto                                          [event-end         gwt-start]
+    auto                                          [gwt-end];
+
+  column-gap: var(--col-gap);
+
+  /* Right/top/bottom padding gives shadow room; left is 0 because the actor
+     column is flush with .stage's content edge (--stage-pad handles the margin). */
+  padding: 16px var(--stage-pad) 48px 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COLUMN CARD
+   ─────────────────────────────────────────────────────────────────────────────
+   display:contents removes the column's own box so its zone children become
+   direct grid items of .atlas-flow. This is the fix for the subgrid circular
+   sizing problem: with display:grid+subgrid, the parent's auto row tracks had
+   no single-row items to drive their heights (the single spanning item is what
+   we're trying to size). With display:contents the zones ARE the single-row
+   items, so row heights resolve from real content.
+
+   CSS custom properties (--col-ctx-border, --col-ctx-tint) still inherit
+   through display:contents to the .zone-bg child — cascade is unaffected.
+
+   The card's visual (border, background, shadow, radius) moves to .zone-bg,
+   a background-only div placed first in source order, spanning all rows.
+══════════════════════════════════════════════════════════════════════════════ */
+.atlas-col {
+  display: contents;
+}
+
+/* Visual card background — gradient fill only; no border (border lives on
+   zone-border so it always renders above zone background colours). */
+.zone-bg {
+  grid-row: header-start / gwt-end;
+  grid-column: var(--slice-col, 2);
+  border-radius: var(--col-radius);
+  background: linear-gradient(
+    180deg,
+    var(--col-ctx-tint, var(--ctx-business-tint)) 0%,
+    var(--atlas-surface) 55%
+  );
+  pointer-events: none;
+}
+
+/* Border overlay — same grid placement, higher z-index than zone backgrounds
+   (z-index: 1) so the card border is always visible above swimlane colours. */
+.zone-border {
+  grid-row: header-start / gwt-end;
+  grid-column: var(--slice-col, 2);
+  border-radius: var(--col-radius);
+  border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
+  box-shadow: var(--col-shadow);
+  background: transparent;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Context modifiers — set the card's border color and tint via custom props */
+.atlas-col--lifecycle {
+  --col-ctx-border: var(--ctx-lifecycle-border);
+  --col-ctx-tint:   var(--ctx-lifecycle-tint);
+}
+.atlas-col--runtime {
+  --col-ctx-border: var(--ctx-runtime-border);
+  --col-ctx-tint:   var(--ctx-runtime-tint);
+}
+.atlas-col--ux {
+  --col-ctx-border: var(--ctx-ux-border);
+  --col-ctx-tint:   var(--ctx-ux-tint);
+}
+.atlas-col--business {
+  --col-ctx-border: var(--ctx-business-border);
+  --col-ctx-tint:   var(--ctx-business-tint);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ZONES
+   ─────────────────────────────────────────────────────────────────────────────
+   Each zone is a direct grid item of .atlas-flow (because .atlas-col uses
+   display:contents). Explicit grid-row + grid-column placement required.
+   grid-column is the slice column number — 2 for the first slice, 3 for the second, etc.
+   (column 1 is always the actor swimlane column)
+   z-index: 1 ensures zones render above the background .zone-bg layer.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* Zone 1 — Header */
+.atlas-col__header {
+  grid-row: header-start / header-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: var(--col-pad) var(--col-pad) 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.atlas-col__header--command,
+.atlas-col__header--view {
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.col-kind-banner {
+  border-radius: calc(var(--col-radius) - var(--col-border-w)) calc(var(--col-radius) - var(--col-border-w)) 0 0;
+  padding: 5px 18px 1px var(--col-pad);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.col-kind-banner--command { background: var(--cmd-header); }
+.col-kind-banner--view    { background: var(--view-header); }
+.col-kind-label {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+.col-meta {
+  padding: 6px var(--col-pad) 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.col-meta__app {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--atlas-text-1);
+}
+.col-meta__concern {
+  font-size: var(--t-xs);
+  font-family: var(--mono);
+  color: var(--atlas-text-2);
+}
+
+/* Column name label — floats above the card, outside zone-bg */
+.atlas-col__colname {
+  grid-row: colname-start / colname-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 0 calc(var(--col-pad) + var(--col-border-w)) 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col-slice-num {
+  font-family: var(--mono);
+  font-size: var(--t-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: var(--atlas-text-1);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 5px 1px;
+  flex-shrink: 0;
+}
+.col-slice-name {
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--atlas-text-2);
+  letter-spacing: 0.01em;
+}
+
+/* Zone 2a — DRIVER mobile sub-lane */
+.atlas-col__driver-mobile {
+  grid-row: driver-mobile-start / driver-mobile-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-driver-bg);
+  padding: 2px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Zone 2b — DRIVER desktop sub-lane */
+.atlas-col__driver-desktop {
+  grid-row: driver-desktop-start / driver-desktop-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-driver-bg);
+  border-top: 1px solid rgba(147, 197, 253, 0.40);
+  padding: 4px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ── LaundryLog desktop thumbnail ──────────────────────────────────────────── */
+.thumb--desktop-ll .thumb__device {
+  width: 152px;
+  border-radius: 5px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(15,23,42,0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.thumb--desktop-ll:hover .thumb__device { box-shadow: 0 5px 14px rgba(15,23,42,0.22); }
+.thumb__ll-nav {
+  height: 9px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.thumb__ll-nav-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.20);
+}
+.thumb__ll-nav-title {
+  flex: 1;
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(0,0,0,0.18);
+  margin: 0 4px;
+}
+.thumb__ll-nav-icon {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.18);
+}
+.thumb__ll-body {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  background: #f1f5f9;
+  padding: 2px;
+}
+.thumb__ll-sidebar {
+  width: 34px;
+  background: #1e293b;
+  border-radius: 2px;
+  padding: 3px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.thumb__ll-entry {
+  height: 8px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.12);
+}
+.thumb__ll-entry--active { background: rgba(251,191,36,0.55); }
+.thumb__ll-main {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__ll-field {
+  height: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  background: #f8fafc;
+}
+.thumb__ll-select-row {
+  display: flex;
+  gap: 2px;
+}
+.thumb__ll-select {
+  flex: 1;
+  height: 8px;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+/* Zone 3 — SYSTEM row: empty for command slices; automation/reactor content for other types */
+.atlas-col__system {
+  grid-row: system-start / system-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-system-bg);
+  min-height: 36px;
+  padding: 4px var(--col-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Zone 2a — ADMIN row */
+.atlas-col__admin {
+  grid-row: admin-start / admin-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-admin-bg);
+  padding: 4px var(--col-pad) 6px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* ── Desktop / dashboard thumbnail ─────────────────────────────────────────── */
+.thumb--desktop .thumb__device {
+  width: 152px;
+  border-radius: 5px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(15,23,42,0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.thumb--desktop:hover .thumb__device { box-shadow: 0 5px 14px rgba(15,23,42,0.22); }
+
+.thumb__titlebar {
+  height: 8px;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.thumb__titlebar-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+}
+.thumb__titlebar-dot--red    { background: #f87171; }
+.thumb__titlebar-dot--yellow { background: #fbbf24; }
+.thumb__titlebar-dot--green  { background: #4ade80; }
+
+.thumb__dash-nav {
+  height: 9px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.thumb__dash-nav-item {
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.22);
+}
+.thumb__dash-nav-item--active { background: #f59e0b; width: 18px; }
+.thumb__dash-nav-item--sm     { width: 12px; }
+.thumb__dash-nav-item--xs     { width: 9px; }
+.thumb__dash-nav-spacer { flex: 1; }
+.thumb__dash-nav-avatar {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.40);
+}
+
+.thumb__dash-body {
+  flex: 1;
+  background: #f1f5f9;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.thumb__dash-kpis {
+  display: flex;
+  gap: 2px;
+}
+.thumb__dash-kpi {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 2px 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.thumb__dash-kpi-val {
+  height: 7px;
+  border-radius: 1px;
+  width: 55%;
+}
+.thumb__dash-kpi-val--a { background: #3b82f6; }
+.thumb__dash-kpi-val--b { background: #f59e0b; }
+.thumb__dash-kpi-val--c { background: #10b981; }
+.thumb__dash-kpi-val--d { background: #ef4444; }
+.thumb__dash-kpi-lbl {
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 1px;
+  width: 80%;
+}
+
+.thumb__dash-main {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+}
+.thumb__dash-chart {
+  flex: 2;
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  padding: 3px 3px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__dash-chart-bars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 0 1px;
+}
+.thumb__dash-chart-bar {
+  flex: 1;
+  border-radius: 1px 1px 0 0;
+  background: #3b82f6;
+}
+.thumb__dash-chart-bar--hi  { background: #f59e0b; }
+.thumb__dash-chart-bar--mid { background: #60a5fa; }
+.thumb__dash-chart-axis {
+  height: 1px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.thumb__dash-sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.thumb__dash-row {
+  background: #fff;
+  border: 1px solid var(--atlas-border);
+  border-radius: 2px;
+  height: 10px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.thumb__dash-row-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.thumb__dash-row-dot--ok  { background: #4ade80; }
+.thumb__dash-row-dot--warn{ background: #fbbf24; }
+.thumb__dash-row-dot--err { background: #f87171; }
+.thumb__dash-row-line {
+  flex: 1; height: 3px;
+  background: #e2e8f0;
+  border-radius: 1px;
+}
+
+/* Zone 2b — REST API row */
+.atlas-col__restapi {
+  grid-row: restapi-start / restapi-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-restapi-bg);
+  padding: 6px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Terminal block — dark code-style endpoint display */
+.terminal-block {
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  width: 100%;
+}
+.terminal-method {
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: #34d399;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.terminal-method--get { color: #60a5fa; }
+.terminal-path {
+  font-size: var(--t-sm);
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+}
+
+/* System icon — large gear centered in the SYSTEM zone */
+.system-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+  color: var(--atlas-border-strong);
+}
+.system-icon svg {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+/* Zone 2c — CLI row */
+.atlas-col__cli {
+  grid-row: cli-start / cli-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: var(--swim-cli-bg);
+  padding: 6px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* CLI terminal line */
+.cli-block {
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  width: 100%;
+  overflow: hidden;
+}
+.cli-prompt {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: #4ade80;
+  flex-shrink: 0;
+}
+.cli-cmd {
+  font-size: var(--t-xs);
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cli-arg { color: #94a3b8; }
+.cli-flag { color: #7dd3fc; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   LANE BANDS
+   ─────────────────────────────────────────────────────────────────────────────
+   First children in .atlas-flow, spanning all columns. They paint behind
+   everything else (document order). In the column-gap between the actor column
+   and each slice card the band color is visible, making swimlane rows readable
+   across all slice columns as the PATH grows.
+══════════════════════════════════════════════════════════════════════════════ */
+.lane-band {
+  grid-column: 1 / -1;
+  pointer-events: none;
+}
+.lane-band--driver  { grid-row: driver-start  / driver-end;  background: var(--swim-driver-bg);  }
+.lane-band--admin   { grid-row: admin-start   / admin-end;   background: var(--swim-admin-bg);   }
+.lane-band--restapi { grid-row: restapi-start / restapi-end; background: var(--swim-restapi-bg); }
+.lane-band--cli     { grid-row: cli-start     / cli-end;     background: var(--swim-cli-bg);     }
+.lane-band--system  { grid-row: system-start  / system-end;  background: var(--swim-system-bg);  }
+
+/* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
+.atlas-col__interface {
+  grid-row: interface-start / interface-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  background: #475569;
+  padding: 3px var(--col-pad);
+  display: flex;
+  align-items: center;
+}
+.interface-label {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Zone 4a — COMMAND entity row */
+.atlas-col__command-entity {
+  grid-row: command-start / command-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 0 var(--col-pad) 6px;
+}
+
+/* Zone 4b — EVENT entity row */
+.atlas-col__event-entity {
+  grid-row: event-start / event-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 0 var(--col-pad) 6px;
+}
+
+/* Zone 5 — GWT (given / when / then) */
+.atlas-col__gwt {
+  grid-row: gwt-start / gwt-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 8px var(--col-pad) var(--col-pad);
+  border-top: 1px dashed rgba(100, 116, 139, 0.28);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ACTOR SWIMLANE COLUMN
+   ─────────────────────────────────────────────────────────────────────────────
+   Always in grid-column: 1. All elements use position:sticky; left:var(--stage-pad)
+   so the column sticks at the left edge of .stage's content area when the flow
+   scrolls horizontally. Vertical scroll passes through freely.
+
+   .actor-bg      — white surface + right border spanning all rows (background layer)
+   .actor-lane    — swimlane cell with tinted bg + rotated label (foreground layer)
+══════════════════════════════════════════════════════════════════════════════ */
+.actor-bg {
+  grid-row: header-start / gwt-end;
+  grid-column: 1;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--atlas-surface);
+  border-right: 2px solid var(--atlas-border-strong);
+}
+
+.actor-lane {
+  grid-column: 1;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.actor-lane--driver {
+  grid-row: driver-start / driver-end;
+  background: var(--swim-driver-bg);
+  border-right: 2px solid #93c5fd;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.actor-lane__group {
+  width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actor-lane--driver > .actor-lane__group {
+  align-self: stretch;
+  border-right: 1px solid rgba(147, 197, 253, 0.40);
+}
+
+.actor-lane--driver > .actor-lane__sub-lanes {
+  flex: 1;
+  align-self: stretch;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.actor-lane__sub-item {
+  height: var(--swim-lane-h);
+  flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actor-lane__sub-item + .actor-lane__sub-item {
+  border-top: 1px solid rgba(147, 197, 253, 0.50);
+}
+
+.actor-lane--admin {
+  grid-row: admin-start / admin-end;
+  background: var(--swim-admin-bg);
+  border-right: 2px solid #fcd34d;
+}
+
+.actor-lane--restapi {
+  grid-row: restapi-start / restapi-end;
+  background: var(--swim-restapi-bg);
+  border-right: 2px solid #5eead4;
+}
+
+.actor-lane--cli {
+  grid-row: cli-start / cli-end;
+  background: var(--swim-cli-bg);
+  border-right: 2px solid #64748b;
+}
+
+.actor-lane--interface {
+  grid-row: interface-start / interface-end;
+  background: var(--atlas-bg);
+  border-right: 2px solid var(--atlas-border-strong);
+}
+
+.actor-lane--system {
+  grid-row: system-start / system-end;
+  background: var(--swim-system-bg);
+  border-right: 2px solid var(--atlas-border);
+}
+
+.actor-lane__label {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.actor-lane--driver .actor-lane__label { color: #1e40af; }
+.actor-lane--admin   .actor-lane__label { color: #92400e; }
+.actor-lane--restapi .actor-lane__label { color: #0f766e; text-transform: none; letter-spacing: 0.06em; }
+.actor-lane--cli     .actor-lane__label { color: #334155; }
+.actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   HEADER INTERNALS
+══════════════════════════════════════════════════════════════════════════════ */
+.col-class-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+/* Kind badge always right-aligns on whichever line it lands on */
+.col-class-row > .badge--kind {
+  margin-left: auto;
+}
+.col-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.col-step {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-4);
+}
+.col-title {
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--atlas-text-1);
+}
+.col-desc {
+  font-size: var(--t-base);
+  line-height: 1.32;
+  color: var(--atlas-text-2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   BADGES
+══════════════════════════════════════════════════════════════════════════════ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  padding: 4px 8px 2px; /* asymmetric: uppercase glyphs sit high in the em square */
+  border-radius: var(--pill-r);
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.badge--group        { background: #0f172a; color: #fff; }
+.badge--context      { background: rgba(255,255,255,0.94); color: var(--atlas-text-1); border-color: var(--atlas-border-strong); }
+.badge--lens         { background: rgba(255,255,255,0.80); color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.badge--actor        { background: #eff6ff; color: #1e3a8a; border-color: #bfdbfe; }
+.badge--actor-system { background: #f8fafc; color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.badge--kind         { border-radius: var(--tag-r); background: #cbd5e1; color: #1e293b; border-color: #bfcad7; font-size: var(--t-2xs); letter-spacing: 0.08em; padding: 4px 6px 2px; }
+.badge--kind-command { background: #dbeafe; color: #1e3a8a; border-color: var(--cmd-border); }
+.badge--kind-event   { background: #ffedd5; color: #9a3412; border-color: var(--evt-border); }
+.badge--kind-view    { background: #dcfce7; color: #14532d; border-color: var(--view-border); }
+.badge--status       { border-radius: var(--tag-r); font-size: var(--t-2xs); padding: 4px 6px 2px; }
+.badge--specified    { background: #dcfce7; color: #166534; border-color: var(--view-border); }
+.badge--draft        { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+.badge--nospec       { background: #f1f5f9; color: var(--atlas-text-3); border-color: var(--atlas-border); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ENTITY BOXES
+══════════════════════════════════════════════════════════════════════════════ */
+.entity {
+  border-radius: var(--box-radius);
+  border: 2px solid;
+  overflow: hidden;
+}
+.entity--command { background: var(--cmd-bg);  border-color: var(--cmd-border);  }
+.entity--event   { background: var(--evt-bg);  border-color: var(--evt-border);  }
+.entity--view    { background: var(--view-bg); border-color: var(--view-border); }
+
+.entity__header {
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.entity--command .entity__header { background: var(--cmd-header);  }
+.entity--event   .entity__header { background: var(--evt-header);  }
+.entity--view    .entity__header { background: var(--view-header); }
+
+.entity__type {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+}
+.entity__name {
+  padding: 6px 8px 5px;
+  font-size: var(--t-base);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--atlas-text-1);
+}
+.entity__fields {
+  margin: 0;
+  padding: 0 8px 7px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.entity__field {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  line-height: 1.4;
+  color: var(--atlas-text-2);
+}
+.entity__fval { color: var(--atlas-text-3); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SCREEN THUMBNAIL
+══════════════════════════════════════════════════════════════════════════════ */
+.thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.thumb__device {
+  width: 68px;
+  border-radius: 13px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15,23,42,0.12);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 120ms;
+}
+.thumb:hover .thumb__device { box-shadow: 0 6px 18px rgba(15,23,42,0.18); }
+.thumb__notch {
+  width: 22px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--atlas-border-strong);
+  align-self: center;
+  margin: 4px 0 2px;
+  flex-shrink: 0;
+}
+.thumb__screen { display: flex; flex-direction: column; flex: 1; }
+.thumb__bar    { height: 9px; flex-shrink: 0; }
+.thumb__bar--ll { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.thumb__body {
+  flex: 1;
+  padding: 5px 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.thumb__name {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--atlas-text-2);
+  text-align: center;
+}
+.thumb__field { height: 10px; border-radius: 4px; background: #e9eff6; border: 1px solid var(--atlas-border); }
+.thumb__chip-row { display: flex; gap: 2px; }
+.thumb__chip  { flex: 1; height: 13px; border-radius: 4px; border: 1px solid var(--atlas-border); background: #fff; }
+.thumb__chip--sel  { background: #fff7ed; border-color: #fdba74; }
+.thumb__chip--sel2 { background: #ede9fe; border-color: #c4b5fd; }
+.thumb__btn { height: 12px; border-radius: 4px; }
+.thumb__btn--primary  { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.thumb__btn--disabled { background: #e2e8f0; }
+.thumb__price-row { display: flex; align-items: center; gap: 3px; }
+.thumb__price-sym { width: 8px;  height: 12px; border-radius: 2px; background: #94a3b8; }
+.thumb__price-val { flex: 1;     height: 12px; border-radius: 3px; border: 1px solid var(--atlas-border); background: #fff; }
+/* List-view thumb (VIEW slices) */
+.thumb__total-row  { display: flex; align-items: center; justify-content: space-between; padding-bottom: 3px; margin-bottom: 3px; border-bottom: 1px solid rgba(0,0,0,0.10); }
+.thumb__total-lbl  { width: 32%; height: 5px; border-radius: 2px; background: rgba(0,0,0,0.22); }
+.thumb__total-val  { width: 18%; height: 5px; border-radius: 2px; background: rgba(34,197,94,0.55); }
+.thumb__list-entry { display: flex; align-items: center; gap: 3px; margin-bottom: 2px; }
+.thumb__list-entry-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(34,197,94,0.55); flex-shrink: 0; }
+.thumb__list-entry-line { flex: 1; height: 5px; border-radius: 2px; background: rgba(0,0,0,0.10); }
+.thumb__list-entry-amt  { width: 14%; height: 5px; border-radius: 2px; background: rgba(0,0,0,0.16); }
+
+/* No-screen variant */
+.thumb--none .thumb__device {
+  border-style: dashed;
+  background: var(--atlas-bg);
+  box-shadow: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 82px;
+  gap: 4px;
+}
+.thumb--none:hover .thumb__device { box-shadow: none; }
+.thumb__none-icon  { font-size: 1.4rem; color: var(--atlas-text-4); }
+.thumb__none-label { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--atlas-text-4); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SHELL CONTROLS
+══════════════════════════════════════════════════════════════════════════════ */
+.shell__controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.shell__ctrl-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+  margin-right: 2px;
+}
+.size-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 30px;
+  padding: 0 7px;
+  border-radius: 6px;
+  border: 1px solid var(--atlas-border-strong);
+  background: var(--atlas-surface);
+  color: var(--atlas-text-2);
+  font-family: var(--font);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 100ms ease;
+}
+.size-btn.is-active {
+  background: var(--atlas-text-1);
+  border-color: var(--atlas-text-1);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GWT ZONE — condensed inline view
+══════════════════════════════════════════════════════════════════════════════ */
+.gwt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+.gwt-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gwt-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.gwt-lbl {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  width: 15px;
+  height: 15px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.gwt-lbl--g        { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--w        { background: #dbeafe; color: #1d4ed8; }   /* blue  — commands */
+.gwt-lbl--t        { background: #ffedd5; color: #c2410c; }   /* orange — events */
+.gwt-lbl--criteria { background: #e2e8f0; color: #0f172a; }   /* slate — criteria/query */
+.gwt-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex: 1;
+}
+.gwt-event {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  color: var(--atlas-text-2);
+  background: rgba(100, 116, 139, 0.08);
+  border: 1px solid var(--atlas-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.gwt-event--given { border-color: #93c5fd; color: #1e40af; background: rgba(59,130,246,0.07); }
+.gwt-event--then  { border-color: #86efac; color: #166534; background: rgba(34,197,94,0.08); }
+.gwt-field {
+  display: inline-flex;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  background: rgba(100, 116, 139, 0.07);
+  border: 1px solid var(--atlas-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+.gwt-field-key { color: var(--atlas-text-3); }
+.gwt-field-sep { color: var(--atlas-text-4); margin: 0 1px; }
+.gwt-field-val { color: var(--atlas-text-1); font-weight: 600; }
+
+/* Mini entity cards inside GWT — scaled-down versions of the full entity boxes */
+.gwt-entity {
+  border-radius: 8px;
+  border: 1.5px solid;
+  overflow: hidden;
+  width: 100%;
+}
+.gwt-entity--command  { background: var(--cmd-bg);              border-color: var(--cmd-border); }
+.gwt-entity--event    { background: var(--evt-bg);              border-color: var(--evt-border); }
+.gwt-entity--view     { background: var(--view-bg);             border-color: var(--view-border); }
+.gwt-entity--criteria { background: rgba(100,116,139,0.08);      border-color: #94a3b8; }
+.gwt-entity__header {
+  padding: 2px 7px;
+  display: flex;
+  align-items: center;
+}
+.gwt-entity--command  .gwt-entity__header { background: var(--cmd-header); }
+.gwt-entity--event    .gwt-entity__header { background: var(--evt-header); }
+.gwt-entity--view     .gwt-entity__header { background: var(--view-header); }
+.gwt-entity--criteria .gwt-entity__header { background: #475569; }
+.gwt-entity__type {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+}
+.gwt-entity__name {
+  padding: 4px 7px;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--atlas-text-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ── Shell header ──────────────────────────────────────────────────────── -->
+  <header class="shell__header">
+    <span class="shell__wordmark">ATLAS</span>
+    <div class="shell__sep"></div>
+    <span class="shell__eyebrow">LaundryLog · PATH1</span>
+    <span class="shell__title">Fresh Launch — No Location — First Entry</span>
+    <div class="shell__controls">
+      <span class="shell__ctrl-label">Size</span>
+      <button class="size-btn" data-size="13" type="button">S</button>
+      <button class="size-btn" data-size="16" type="button">M</button>
+      <button class="size-btn" data-size="19" type="button">L</button>
+      <button class="size-btn" data-size="22" type="button">XL</button>
+    </div>
+  </header>
+
+  <div class="shell__annotation">
+    Grid prototype · One COMMAND slice · Flow rows = content zones, shared across all future columns
+  </div>
+
+  <!-- ── Stage ─────────────────────────────────────────────────────────────── -->
+  <main class="stage">
+
+    <div class="atlas-flow">
+
+      <!-- Lane bands — first in source order so they paint behind everything.
+           Span all columns; visible in the column-gap between cards. ───────── -->
+      <div class="lane-band lane-band--driver"  aria-hidden="true"></div>
+      <div class="lane-band lane-band--admin"   aria-hidden="true"></div>
+      <div class="lane-band lane-band--restapi" aria-hidden="true"></div>
+      <div class="lane-band lane-band--cli"     aria-hidden="true"></div>
+      <div class="lane-band lane-band--system"  aria-hidden="true"></div>
+
+      <!-- Actor column — grid col 1, sticky on horizontal scroll ─────────── -->
+      <div class="actor-bg" aria-hidden="true"></div>
+      <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">Driver</span>
+        </div>
+        <div class="actor-lane__sub-lanes">
+          <div class="actor-lane__sub-item">
+            <span class="actor-lane__label">Mobile</span>
+          </div>
+          <div class="actor-lane__sub-item">
+            <span class="actor-lane__label">Desktop</span>
+          </div>
+        </div>
+      </div>
+      <div class="actor-lane actor-lane--admin" aria-label="Admin swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">ADMIN</span>
+        </div>
+      </div>
+      <div class="actor-lane actor-lane--restapi" aria-label="RestAPI swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">RestAPI</span>
+        </div>
+      </div>
+      <div class="actor-lane actor-lane--cli" aria-label="CLI swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">CLI</span>
+        </div>
+      </div>
+      <div class="actor-lane actor-lane--interface" aria-hidden="true"></div>
+      <div class="actor-lane actor-lane--system" aria-label="System swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">System</span>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           LogExpense · Business · COMMAND slice
+           ────────────────────────────────────────────────────────────────────
+           Spans grid-row header-start / gwt-end via subgrid.
+           Five direct children → auto-placed into five inherited row zones.
+      ════════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" style="--slice-col: 2" aria-label="LogExpense slice">
+
+        <!-- Card visual — spans all rows; behind content zones (first in source order) -->
+        <div class="zone-bg" aria-hidden="true"></div>
+
+        <!-- Column name — above card -->
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">01</span>
+        </div>
+
+        <!-- Zone 1: Header — slice kind + meta -->
+        <div class="atlas-col__header atlas-col__header--command">
+          <div class="col-kind-banner col-kind-banner--command">
+            <span class="col-kind-label">Command</span>
+          </div>
+          <div class="col-meta">
+            <span class="col-meta__app">LaundryLog</span>
+            <span class="col-meta__concern">Business.Behavior</span>
+          </div>
+        </div>
+
+        <!-- Zone 2a: DRIVER mobile sub-lane -->
+        <div class="atlas-col__driver-mobile">
+          <div class="thumb">
+            <div class="thumb__device">
+              <div class="thumb__notch"></div>
+              <div class="thumb__screen">
+                <div class="thumb__bar thumb__bar--ll"></div>
+                <div class="thumb__body">
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__price-row">
+                    <div class="thumb__price-sym"></div>
+                    <div class="thumb__price-val"></div>
+                  </div>
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel2"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__btn thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <!-- Zone 2b: DRIVER desktop sub-lane — LaundryLog desktop view -->
+        <div class="atlas-col__driver-desktop">
+          <div class="thumb thumb--desktop-ll">
+            <div class="thumb__device">
+              <div class="thumb__ll-nav">
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-title"></div>
+                <div class="thumb__ll-nav-icon"></div>
+              </div>
+              <div class="thumb__ll-body">
+                <div class="thumb__ll-sidebar">
+                  <div class="thumb__ll-entry thumb__ll-entry--active"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                </div>
+                <div class="thumb__ll-main">
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-select-row">
+                    <div class="thumb__ll-select"></div>
+                    <div class="thumb__ll-select"></div>
+                  </div>
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-field"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <!-- Zone 2a: ADMIN row — wide desktop dashboard thumbnail -->
+        <div class="atlas-col__admin">
+          <div class="thumb thumb--desktop">
+            <div class="thumb__device">
+              <div class="thumb__titlebar">
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--red"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--yellow"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--green"></div>
+              </div>
+              <div class="thumb__dash-nav">
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--active"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--sm"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--xs"></div>
+                <div class="thumb__dash-nav-spacer"></div>
+                <div class="thumb__dash-nav-avatar"></div>
+              </div>
+              <div class="thumb__dash-body">
+                <div class="thumb__dash-kpis">
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--a"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--b"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--c"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                  <div class="thumb__dash-kpi">
+                    <div class="thumb__dash-kpi-val thumb__dash-kpi-val--d"></div>
+                    <div class="thumb__dash-kpi-lbl"></div>
+                  </div>
+                </div>
+                <div class="thumb__dash-main">
+                  <div class="thumb__dash-chart">
+                    <div class="thumb__dash-chart-bars">
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:45%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:70%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:90%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:55%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:80%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:60%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:75%"></div>
+                    </div>
+                    <div class="thumb__dash-chart-axis"></div>
+                  </div>
+                  <div class="thumb__dash-sidebar">
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--warn"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                    <div class="thumb__dash-row">
+                      <div class="thumb__dash-row-dot thumb__dash-row-dot--err"></div>
+                      <div class="thumb__dash-row-line"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">AdminDashboard</span>
+          </div>
+        </div>
+
+        <!-- Zone 2b: RestAPI row -->
+        <div class="atlas-col__restapi">
+          <div class="terminal-block">
+            <span class="terminal-method">POST</span>
+            <span class="terminal-path">/api/log-expense</span>
+          </div>
+        </div>
+
+        <!-- Zone 2c: CLI row -->
+        <div class="atlas-col__cli">
+          <div class="cli-block">
+            <span class="cli-prompt">$</span>
+            <span class="cli-cmd">./laundrylog-cli <span class="cli-flag">-c</span> log-expense <span class="cli-arg">--machinetype:dryer</span></span>
+          </div>
+        </div>
+
+        <!-- Zone 3a: INTERFACE divider -->
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <!-- Zone 3b: SYSTEM row — gear icon placeholder -->
+        <div class="atlas-col__system">
+          <div class="system-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Zone 4a: COMMAND entity -->
+        <div class="atlas-col__command-entity">
+          <div class="entity entity--command">
+            <div class="entity__header"><span class="entity__type">Command</span></div>
+            <div class="entity__name">LogExpense</div>
+          </div>
+        </div>
+
+        <!-- Zone 4b: EVENT entity -->
+        <div class="atlas-col__event-entity">
+          <div class="entity entity--event">
+            <div class="entity__header"><span class="entity__type">Event</span></div>
+            <div class="entity__name">LaundryExpenseLogged</div>
+          </div>
+        </div>
+
+        <!-- Zone 5: GWT — condensed inline -->
+        <div class="atlas-col__gwt">
+          <div class="gwt-header">
+            <span class="badge badge--status badge--specified">Specified</span>
+          </div>
+          <div class="gwt-block">
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">AppOpened</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--w">W</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--command">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Command</span></div>
+                  <div class="gwt-entity__name">LogExpense</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Border overlay — redraws card border above all zone backgrounds -->
+        <div class="zone-border" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           Slice 02 — duplicate placeholder
+      ════════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" style="--slice-col: 3" aria-label="LogExpense slice 2">
+
+        <div class="zone-bg" aria-hidden="true"></div>
+
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">02</span>
+        </div>
+
+        <div class="atlas-col__header">
+          <div class="col-class-row">
+            <div class="col-badges">
+              <span class="badge badge--group">Business</span>
+              <span class="badge badge--context">Domain</span>
+            </div>
+            <span class="badge badge--kind badge--kind-command">COMMAND</span>
+          </div>
+          <div class="col-badges">
+            <span class="badge badge--lens">AEM</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver-mobile">
+          <div class="thumb">
+            <div class="thumb__device">
+              <div class="thumb__notch"></div>
+              <div class="thumb__screen">
+                <div class="thumb__bar thumb__bar--ll"></div>
+                <div class="thumb__body">
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__price-row">
+                    <div class="thumb__price-sym"></div>
+                    <div class="thumb__price-val"></div>
+                  </div>
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel2"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__btn thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver-desktop">
+          <div class="thumb thumb--desktop-ll">
+            <div class="thumb__device">
+              <div class="thumb__ll-nav">
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-title"></div>
+                <div class="thumb__ll-nav-icon"></div>
+              </div>
+              <div class="thumb__ll-body">
+                <div class="thumb__ll-sidebar">
+                  <div class="thumb__ll-entry thumb__ll-entry--active"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                </div>
+                <div class="thumb__ll-main">
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-select-row">
+                    <div class="thumb__ll-select"></div>
+                    <div class="thumb__ll-select"></div>
+                  </div>
+                  <div class="thumb__ll-field"></div>
+                  <div class="thumb__ll-field"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__admin">
+          <div class="thumb thumb--desktop">
+            <div class="thumb__device">
+              <div class="thumb__titlebar">
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--red"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--yellow"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--green"></div>
+              </div>
+              <div class="thumb__dash-nav">
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--active"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--sm"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--xs"></div>
+                <div class="thumb__dash-nav-spacer"></div>
+                <div class="thumb__dash-nav-avatar"></div>
+              </div>
+              <div class="thumb__dash-body">
+                <div class="thumb__dash-kpis">
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--a"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--b"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--c"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--d"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                </div>
+                <div class="thumb__dash-main">
+                  <div class="thumb__dash-chart">
+                    <div class="thumb__dash-chart-bars">
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:45%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:70%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:90%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:55%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:80%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:60%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:75%"></div>
+                    </div>
+                    <div class="thumb__dash-chart-axis"></div>
+                  </div>
+                  <div class="thumb__dash-sidebar">
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--warn"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--err"></div><div class="thumb__dash-row-line"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">AdminDashboard</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__restapi">
+          <div class="terminal-block">
+            <span class="terminal-method">POST</span>
+            <span class="terminal-path">/api/log-expense</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__cli">
+          <div class="cli-block">
+            <span class="cli-prompt">$</span>
+            <span class="cli-cmd">./laundrylog-cli <span class="cli-flag">-c</span> log-expense <span class="cli-arg">--machinetype:dryer</span></span>
+          </div>
+        </div>
+
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <div class="atlas-col__system">
+          <div class="system-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="atlas-col__command-entity">
+          <div class="entity entity--command">
+            <div class="entity__header"><span class="entity__type">Command</span></div>
+            <div class="entity__name">LogExpense</div>
+            <ul class="entity__fields">
+              <li class="entity__field">machineType</li>
+              <li class="entity__field">quantity</li>
+              <li class="entity__field">unitPrice</li>
+              <li class="entity__field">payment</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__event-entity">
+          <div class="entity entity--event">
+            <div class="entity__header"><span class="entity__type">Event</span></div>
+            <div class="entity__name">LaundryExpenseLogged</div>
+            <ul class="entity__fields">
+              <li class="entity__field">location</li>
+              <li class="entity__field">machineType</li>
+              <li class="entity__field">lineTotal</li>
+              <li class="entity__field">payment</li>
+              <li class="entity__field">occurredAt</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt">
+          <div class="gwt-header">
+            <span class="badge badge--status badge--specified">Specified</span>
+          </div>
+          <div class="gwt-block">
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">AppOpened</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--w">W</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--command">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Command</span></div>
+                  <div class="gwt-entity__name">LogExpense</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="zone-border" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           Slice 03 — RecentExpenses · Business · VIEW slice
+      ════════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" style="--slice-col: 4" aria-label="RecentExpenses slice">
+
+        <div class="zone-bg" aria-hidden="true"></div>
+
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">03</span>
+        </div>
+
+        <!-- Zone 1: Header — slice kind + meta -->
+        <div class="atlas-col__header atlas-col__header--view">
+          <div class="col-kind-banner col-kind-banner--view">
+            <span class="col-kind-label">View</span>
+          </div>
+          <div class="col-meta">
+            <span class="col-meta__app">LaundryLog</span>
+            <span class="col-meta__concern">Business.Translation</span>
+          </div>
+        </div>
+
+        <!-- Zone admin: empty -->
+        <div class="atlas-col__admin"></div>
+
+        <!-- Zone interface -->
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <!-- Zone system -->
+        <div class="atlas-col__system">
+          <div class="system-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Zone 4a: VIEW entity -->
+        <div class="atlas-col__command-entity">
+          <div class="entity entity--view">
+            <div class="entity__header"><span class="entity__type">View</span></div>
+            <div class="entity__name">RecentExpenses</div>
+          </div>
+        </div>
+
+        <!-- Zone 4b: empty — no output event for a VIEW slice -->
+        <div class="atlas-col__event-entity"></div>
+
+        <!-- Zone 5: GWT -->
+        <div class="atlas-col__gwt">
+          <div class="gwt-header">
+            <span class="badge badge--status badge--specified">Specified</span>
+          </div>
+          <div class="gwt-block">
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--criteria">W</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--criteria">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Criteria</span></div>
+                  <div class="gwt-entity__name">RecentExpensesCriteria</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--view">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">View</span></div>
+                  <div class="gwt-entity__name">RecentExpenses</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="zone-border" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           Slice 04 — RecentExpenses · Business · VIEW slice (copy of 03)
+      ════════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" style="--slice-col: 5" aria-label="RecentExpenses slice 4">
+
+        <div class="zone-bg" aria-hidden="true"></div>
+
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">04</span>
+        </div>
+
+        <div class="atlas-col__header atlas-col__header--view">
+          <div class="col-kind-banner col-kind-banner--view">
+            <span class="col-kind-label">View</span>
+          </div>
+          <div class="col-meta">
+            <span class="col-meta__app">LaundryLog</span>
+            <span class="col-meta__concern">Business.Translation</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver-mobile">
+          <div class="thumb">
+            <div class="thumb__device">
+              <div class="thumb__notch"></div>
+              <div class="thumb__screen">
+                <div class="thumb__bar thumb__bar--ll"></div>
+                <div class="thumb__body">
+                  <div class="thumb__total-row">
+                    <div class="thumb__total-lbl"></div>
+                    <div class="thumb__total-val"></div>
+                  </div>
+                  <div class="thumb__list-entry">
+                    <div class="thumb__list-entry-dot"></div>
+                    <div class="thumb__list-entry-line"></div>
+                    <div class="thumb__list-entry-amt"></div>
+                  </div>
+                  <div class="thumb__list-entry">
+                    <div class="thumb__list-entry-dot"></div>
+                    <div class="thumb__list-entry-line"></div>
+                    <div class="thumb__list-entry-amt"></div>
+                  </div>
+                  <div class="thumb__list-entry">
+                    <div class="thumb__list-entry-dot"></div>
+                    <div class="thumb__list-entry-line"></div>
+                    <div class="thumb__list-entry-amt"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">RecentExpenses</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver-desktop">
+          <div class="thumb thumb--desktop-ll">
+            <div class="thumb__device">
+              <div class="thumb__ll-nav">
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-dot"></div>
+                <div class="thumb__ll-nav-title"></div>
+                <div class="thumb__ll-nav-icon"></div>
+              </div>
+              <div class="thumb__ll-body">
+                <div class="thumb__ll-sidebar">
+                  <div class="thumb__ll-entry thumb__ll-entry--active"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                  <div class="thumb__ll-entry"></div>
+                </div>
+                <div class="thumb__ll-main">
+                  <div class="thumb__total-row">
+                    <div class="thumb__total-lbl"></div>
+                    <div class="thumb__total-val"></div>
+                  </div>
+                  <div class="thumb__list-entry">
+                    <div class="thumb__list-entry-dot"></div>
+                    <div class="thumb__list-entry-line"></div>
+                    <div class="thumb__list-entry-amt"></div>
+                  </div>
+                  <div class="thumb__list-entry">
+                    <div class="thumb__list-entry-dot"></div>
+                    <div class="thumb__list-entry-line"></div>
+                    <div class="thumb__list-entry-amt"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">RecentExpenses</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__admin"></div>
+
+        <div class="atlas-col__restapi">
+          <div class="terminal-block">
+            <span class="terminal-method terminal-method--get">GET</span>
+            <span class="terminal-path">/api/recent-expenses</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__cli">
+          <div class="cli-block">
+            <span class="cli-prompt">$</span>
+            <span class="cli-cmd">./laundrylog-cli <span class="cli-flag">-q</span> recent-expenses</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <div class="atlas-col__system">
+          <div class="system-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="atlas-col__command-entity">
+          <div class="entity entity--view">
+            <div class="entity__header"><span class="entity__type">View</span></div>
+            <div class="entity__name">RecentExpenses</div>
+            <ul class="entity__fields">
+              <li class="entity__field">sessionTotal</li>
+              <li class="entity__field">entries</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__event-entity"></div>
+
+        <div class="atlas-col__gwt">
+          <div class="gwt-header">
+            <span class="badge badge--status badge--specified">Specified</span>
+          </div>
+          <div class="gwt-block">
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--event">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Event</span></div>
+                  <div class="gwt-entity__name">LaundryExpenseLogged</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--criteria">W</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--criteria">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">Criteria</span></div>
+                  <div class="gwt-entity__name">RecentExpensesCriteria</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items">
+                <div class="gwt-entity gwt-entity--view">
+                  <div class="gwt-entity__header"><span class="gwt-entity__type">View</span></div>
+                  <div class="gwt-entity__name">RecentExpenses</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="zone-border" aria-hidden="true"></div>
+
+      </section>
+
+    </div><!-- /atlas-flow -->
+
+  </main>
+
+</div><!-- /shell -->
+
+<script>
+(function () {
+  const sizeBtns = document.querySelectorAll('.size-btn');
+
+  function applySize(px) {
+    document.documentElement.style.fontSize = px + 'px';
+    sizeBtns.forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.size) === px));
+    localStorage.setItem('atlas-slice-size', px);
+  }
+
+  sizeBtns.forEach(btn => {
+    btn.addEventListener('click', () => applySize(parseInt(btn.dataset.size)));
+  });
+
+  const saved = parseInt(localStorage.getItem('atlas-slice-size')) || 16;
+  applySize(saved);
+})();
+</script>
+
+</body>
+</html>
