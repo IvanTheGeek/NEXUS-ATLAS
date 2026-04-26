@@ -172,7 +172,7 @@ body {
   /* Column 1: actor swimlane column (fixed width, always sticky).
      Column 2+: slice columns (--col-w each).
      grid-auto-columns handles slices beyond the explicit template. */
-  grid-template-columns: var(--actor-col-w) var(--col-w);
+  grid-template-columns: var(--actor-col-w) repeat(2, var(--col-w));
   grid-auto-columns: var(--col-w);
 
   /* Named row zones.
@@ -180,7 +180,8 @@ body {
      the CSS Grid grammar allows only one <line-names> at each track boundary.
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
-    [header-start]              auto              [header-end        driver-start]
+    [colname-start]             auto              [colname-end       header-start]
+    auto                                          [header-end        driver-start]
     var(--swim-lane-h)                            [driver-end        admin-start]
     var(--swim-lane-h)                            [admin-end         restapi-start]
     var(--swim-lane-h)                            [restapi-end       cli-start]
@@ -221,7 +222,7 @@ body {
    zone-border so it always renders above zone background colours). */
 .zone-bg {
   grid-row: header-start / gwt-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   border-radius: var(--col-radius);
   background: linear-gradient(
     180deg,
@@ -235,7 +236,7 @@ body {
    (z-index: 1) so the card border is always visible above swimlane colours. */
 .zone-border {
   grid-row: header-start / gwt-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   border-radius: var(--col-radius);
   border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
   box-shadow: var(--col-shadow);
@@ -275,7 +276,7 @@ body {
 /* Zone 1 — Header */
 .atlas-col__header {
   grid-row: header-start / header-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   padding: var(--col-pad) var(--col-pad) 8px;
   display: flex;
@@ -283,10 +284,38 @@ body {
   gap: 5px;
 }
 
+/* Column name label — floats above the card, outside zone-bg */
+.atlas-col__colname {
+  grid-row: colname-start / colname-end;
+  grid-column: var(--slice-col, 2);
+  z-index: 1;
+  padding: 0 calc(var(--col-pad) + var(--col-border-w)) 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.col-slice-num {
+  font-family: var(--mono);
+  font-size: var(--t-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: var(--atlas-text-1);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 5px 1px;
+  flex-shrink: 0;
+}
+.col-slice-name {
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--atlas-text-2);
+  letter-spacing: 0.01em;
+}
+
 /* Zone 2 — DRIVER row: screen thumbnail */
 .atlas-col__driver {
   grid-row: driver-start / driver-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-driver-bg);
   padding: 2px var(--col-pad) 8px;
@@ -298,7 +327,7 @@ body {
 /* Zone 3 — SYSTEM row: empty for command slices; automation/reactor content for other types */
 .atlas-col__system {
   grid-row: system-start / system-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-system-bg);
   min-height: 36px;
@@ -311,7 +340,7 @@ body {
 /* Zone 2a — ADMIN row */
 .atlas-col__admin {
   grid-row: admin-start / admin-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-admin-bg);
   padding: 4px var(--col-pad) 6px;
@@ -481,7 +510,7 @@ body {
 /* Zone 2b — REST API row */
 .atlas-col__restapi {
   grid-row: restapi-start / restapi-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-restapi-bg);
   padding: 6px var(--col-pad) 8px;
@@ -532,7 +561,7 @@ body {
 /* Zone 2c — CLI row */
 .atlas-col__cli {
   grid-row: cli-start / cli-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: var(--swim-cli-bg);
   padding: 6px var(--col-pad) 8px;
@@ -591,7 +620,7 @@ body {
 /* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
 .atlas-col__interface {
   grid-row: interface-start / interface-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   background: #475569;
   padding: 3px var(--col-pad);
@@ -609,7 +638,7 @@ body {
 /* Zone 4 — COMMAND / VIEW entities: command or view entity box(es) */
 .atlas-col__entities {
   grid-row: entities-start / entities-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   padding: 0 var(--col-pad) 6px;
   display: flex;
@@ -620,7 +649,7 @@ body {
 /* Zone 5 — GWT (given / when / then) */
 .atlas-col__gwt {
   grid-row: gwt-start / gwt-end;
-  grid-column: 2;
+  grid-column: var(--slice-col, 2);
   z-index: 1;
   padding: 8px var(--col-pad) var(--col-pad);
   border-top: 1px dashed rgba(100, 116, 139, 0.28);
@@ -1069,10 +1098,16 @@ body {
            Spans grid-row header-start / gwt-end via subgrid.
            Five direct children → auto-placed into five inherited row zones.
       ════════════════════════════════════════════════════════════════════ -->
-      <section class="atlas-col atlas-col--business" aria-label="LogExpense slice">
+      <section class="atlas-col atlas-col--business" style="--slice-col: 2" aria-label="LogExpense slice">
 
         <!-- Card visual — spans all rows; behind content zones (first in source order) -->
         <div class="zone-bg" aria-hidden="true"></div>
+
+        <!-- Column name — above card -->
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">01</span>
+          <span class="col-slice-name">LogExpense</span>
+        </div>
 
         <!-- Zone 1: Header — classification badges only -->
         <div class="atlas-col__header">
@@ -1303,6 +1338,189 @@ body {
         </div>
 
         <!-- Border overlay — redraws card border above all zone backgrounds -->
+        <div class="zone-border" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════════════
+           Slice 02 — duplicate placeholder
+      ════════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" style="--slice-col: 3" aria-label="LogExpense slice 2">
+
+        <div class="zone-bg" aria-hidden="true"></div>
+
+        <div class="atlas-col__colname">
+          <span class="col-slice-num">02</span>
+          <span class="col-slice-name">LogExpense</span>
+        </div>
+
+        <div class="atlas-col__header">
+          <div class="col-class-row">
+            <div class="col-badges">
+              <span class="badge badge--group">Business</span>
+              <span class="badge badge--context">Domain</span>
+            </div>
+            <span class="badge badge--kind badge--kind-command">COMMAND</span>
+          </div>
+          <div class="col-badges">
+            <span class="badge badge--lens">AEM</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__driver">
+          <div class="thumb">
+            <div class="thumb__device">
+              <div class="thumb__notch"></div>
+              <div class="thumb__screen">
+                <div class="thumb__bar thumb__bar--ll"></div>
+                <div class="thumb__body">
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__price-row">
+                    <div class="thumb__price-sym"></div>
+                    <div class="thumb__price-val"></div>
+                  </div>
+                  <div class="thumb__chip-row">
+                    <div class="thumb__chip thumb__chip--sel2"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                    <div class="thumb__chip"></div>
+                  </div>
+                  <div class="thumb__btn thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__admin">
+          <div class="thumb thumb--desktop">
+            <div class="thumb__device">
+              <div class="thumb__titlebar">
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--red"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--yellow"></div>
+                <div class="thumb__titlebar-dot thumb__titlebar-dot--green"></div>
+              </div>
+              <div class="thumb__dash-nav">
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--active"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--sm"></div>
+                <div class="thumb__dash-nav-item thumb__dash-nav-item--xs"></div>
+                <div class="thumb__dash-nav-spacer"></div>
+                <div class="thumb__dash-nav-avatar"></div>
+              </div>
+              <div class="thumb__dash-body">
+                <div class="thumb__dash-kpis">
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--a"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--b"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--c"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                  <div class="thumb__dash-kpi"><div class="thumb__dash-kpi-val thumb__dash-kpi-val--d"></div><div class="thumb__dash-kpi-lbl"></div></div>
+                </div>
+                <div class="thumb__dash-main">
+                  <div class="thumb__dash-chart">
+                    <div class="thumb__dash-chart-bars">
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:45%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:70%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:90%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:55%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--mid" style="height:80%"></div>
+                      <div class="thumb__dash-chart-bar" style="height:60%"></div>
+                      <div class="thumb__dash-chart-bar thumb__dash-chart-bar--hi" style="height:75%"></div>
+                    </div>
+                    <div class="thumb__dash-chart-axis"></div>
+                  </div>
+                  <div class="thumb__dash-sidebar">
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--warn"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--ok"></div><div class="thumb__dash-row-line"></div></div>
+                    <div class="thumb__dash-row"><div class="thumb__dash-row-dot thumb__dash-row-dot--err"></div><div class="thumb__dash-row-line"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="thumb__name">AdminDashboard</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__restapi">
+          <div class="terminal-block">
+            <span class="terminal-method">POST</span>
+            <span class="terminal-path">/api/log-expense</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__cli">
+          <div class="cli-block">
+            <span class="cli-prompt">$</span>
+            <span class="cli-cmd">./laundrylog-cli <span class="cli-flag">-c</span> log-expense <span class="cli-arg">--machinetype:dryer</span></span>
+          </div>
+        </div>
+
+        <div class="atlas-col__interface">
+          <span class="interface-label">Interface</span>
+        </div>
+
+        <div class="atlas-col__system">
+          <div class="system-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="atlas-col__entities">
+          <div class="entity entity--command">
+            <div class="entity__header"><span class="entity__type">Command</span></div>
+            <div class="entity__name">LogExpense</div>
+            <ul class="entity__fields">
+              <li class="entity__field">machineType</li>
+              <li class="entity__field">quantity</li>
+              <li class="entity__field">unitPrice</li>
+              <li class="entity__field">payment</li>
+            </ul>
+          </div>
+          <div class="entity entity--event">
+            <div class="entity__header"><span class="entity__type">Event</span></div>
+            <div class="entity__name">LaundryExpenseLogged</div>
+            <ul class="entity__fields">
+              <li class="entity__field">location</li>
+              <li class="entity__field">machineType</li>
+              <li class="entity__field">lineTotal</li>
+              <li class="entity__field">payment</li>
+              <li class="entity__field">occurredAt</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt">
+          <div class="gwt-header">
+            <span class="badge badge--status badge--specified">Specified</span>
+          </div>
+          <div class="gwt-block">
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--g">G</span>
+              <div class="gwt-items"><span class="gwt-event gwt-event--given">AppOpened</span></div>
+            </div>
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--w">W</span>
+              <div class="gwt-items">
+                <span class="gwt-field"><span class="gwt-field-key">machineType</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">Dryer</span></span>
+                <span class="gwt-field"><span class="gwt-field-key">quantity</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">1</span></span>
+                <span class="gwt-field"><span class="gwt-field-key">unitPrice</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">2.50</span></span>
+                <span class="gwt-field"><span class="gwt-field-key">payment</span><span class="gwt-field-sep">:</span><span class="gwt-field-val">Coins</span></span>
+              </div>
+            </div>
+            <div class="gwt-section">
+              <span class="gwt-lbl gwt-lbl--t">T</span>
+              <div class="gwt-items"><span class="gwt-event gwt-event--then">LaundryExpenseLogged</span></div>
+            </div>
+          </div>
+        </div>
+
         <div class="zone-border" aria-hidden="true"></div>
 
       </section>
