@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═════════════════════════════════════════════════════════════════════════════
+   ATLAS DESIGN SYSTEM — TOKEN LAYER
+   Canonical values. All components read these — nothing invented at component level.
+   Target: large screen (tablet minimum, laptop/desktop typical). No mobile layout.
+   Base font: 16px (browser default). User-adjustable via text size control.
+═════════════════════════════════════════════════════════════════════════════ */
+
+/* ── DS document shell tokens (separate from ATLAS component tokens) ──────── */
+:root {
+  /* Chrome — light mode */
+  --ds-bg:             #f0f4f8;
+  --ds-surface:        #ffffff;
+  --ds-surface-sunken: #e8edf3;
+  --ds-border:         #d1dce8;
+  --ds-border-strong:  #b0c2d8;
+  --ds-text-1:         #0d2440;
+  --ds-text-2:         #3d5573;
+  --ds-text-3:         #6a88a8;
+  --ds-text-4:         #9ab3cc;
+  --ds-accent:         #1e40af;
+  --ds-accent-subtle:  #eff6ff;
+  --ds-accent-text:    #1e3a8a;
+
+  /* Nav */
+  --ds-nav-w:          248px;
+  --ds-nav-bg:         #ffffff;
+  --ds-nav-border:     #d1dce8;
+
+  /* Typography — document shell */
+  --ds-font:           "IBM Plex Sans", system-ui, sans-serif;
+  --ds-mono:           "IBM Plex Mono", "Cascadia Code", monospace;
+
+  /* Sizes relative to root font-size (user-controlled, default 16px) */
+  --ds-text-xs:    0.75rem;   /* 12px @ 16px base */
+  --ds-text-sm:    0.875rem;  /* 14px */
+  --ds-text-base:  1rem;      /* 16px */
+  --ds-text-md:    1.125rem;  /* 18px */
+  --ds-text-lg:    1.375rem;  /* 22px */
+  --ds-text-xl:    1.75rem;   /* 28px */
+  --ds-text-2xl:   2.25rem;   /* 36px */
+
+  /* Shadows */
+  --ds-shadow-sm:  0 1px 3px rgba(10,27,49,0.07), 0 1px 2px rgba(10,27,49,0.04);
+  --ds-shadow-md:  0 4px 12px rgba(10,27,49,0.08), 0 1px 3px rgba(10,27,49,0.05);
+
+  /* ── ATLAS COMPONENT TOKENS (canonical — referenced by atlas-column-gallery.html) ── */
+
+  /* Component chrome */
+  --atlas-bg:              #eef2f7;
+  --atlas-surface:         #ffffff;
+  --atlas-border:          #dbe5f1;
+  --atlas-border-strong:   #c2d4e8;
+  --atlas-text-1:          #0d2440;
+  --atlas-text-2:          #48627f;
+  --atlas-text-3:          #7a96b0;
+  --atlas-text-4:          #a8bfd6;
+
+  /* Entity types — semantic, fixed across all apps */
+  --cmd-bg:                rgba(59, 130, 246, 0.11);
+  --cmd-border:            #93c5fd;
+  --cmd-header:            #1d4ed8;
+  --cmd-text:              #1e3a8a;
+
+  --evt-bg:                rgba(249, 115, 22, 0.12);
+  --evt-border:            #fdba74;
+  --evt-header:            #ea580c;
+  --evt-text:              #9a3412;
+
+  --view-bg:               rgba(34, 197, 94, 0.10);
+  --view-border:           #86efac;
+  --view-header:           #16a34a;
+  --view-text:             #14532d;
+
+  /* Concern context — column border + tint */
+  --ctx-lifecycle-border:  #1e40af;
+  --ctx-lifecycle-tint:    #dbeafe;
+  --ctx-runtime-border:    #0e7490;
+  --ctx-runtime-tint:      #e0f2fe;
+  --ctx-ux-border:         #6d28d9;
+  --ctx-ux-tint:           #ede9fe;
+  --ctx-business-border:   #15263d;
+  --ctx-business-tint:     #f4f6fa;
+
+  /* Column geometry */
+  --col-w:                 292px;
+  --col-radius:            24px;
+  --col-border-w:          4px;
+  --col-pad:               10px;
+  --col-gap:               18px;
+  --box-radius:            14px;
+  --badge-radius-pill:     999px;
+  --badge-radius-tag:      4px;
+  --col-shadow:            0 10px 24px rgba(10,27,49,0.10);
+
+  /* Component typography (dense — used inside column cards, not DS shell) */
+  --comp-font:             "IBM Plex Sans", system-ui, sans-serif;
+  --comp-mono:             "IBM Plex Mono", monospace;
+  --comp-2xs:  0.50rem;
+  --comp-xs:   0.56rem;
+  --comp-sm:   0.64rem;
+  --comp-base: 0.72rem;
+  --comp-md:   0.84rem;
+}
+
+/* ── Dark mode overrides ──────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* DS shell */
+  --ds-bg:             #0a1628;
+  --ds-surface:        #111e30;
+  --ds-surface-sunken: #0d1824;
+  --ds-border:         #1c2e45;
+  --ds-border-strong:  #273f5c;
+  --ds-text-1:         #d8e8f5;
+  --ds-text-2:         #7a9cbf;
+  --ds-text-3:         #435e7a;
+  --ds-text-4:         #2c4460;
+  --ds-accent:         #60a5fa;
+  --ds-accent-subtle:  #0c1e3b;
+  --ds-accent-text:    #93c5fd;
+  --ds-nav-bg:         #0f1c2d;
+  --ds-nav-border:     #1c2e45;
+
+  /* ATLAS component chrome */
+  --atlas-bg:             #0a1628;
+  --atlas-surface:        #111e30;
+  --atlas-border:         #1c2e45;
+  --atlas-border-strong:  #273f5c;
+  --atlas-text-1:         #d8e8f5;
+  --atlas-text-2:         #6a8dae;
+  --atlas-text-3:         #3d5a78;
+  --atlas-text-4:         #243a54;
+
+  /* Entity types — slightly adjusted for dark bg readability */
+  --cmd-bg:               rgba(59, 130, 246, 0.16);
+  --cmd-border:           #3b82f6;
+  --cmd-header:           #1d4ed8;
+
+  --evt-bg:               rgba(249, 115, 22, 0.16);
+  --evt-border:           #f97316;
+  --evt-header:           #c2410c;
+
+  --view-bg:              rgba(34, 197, 94, 0.14);
+  --view-border:          #22c55e;
+  --view-header:          #15803d;
+
+  /* Concern context — brighter borders for dark bg */
+  --ctx-lifecycle-border: #3b82f6;
+  --ctx-lifecycle-tint:   #0c1e3b;
+  --ctx-runtime-border:   #0891b2;
+  --ctx-runtime-tint:     #0a1e2d;
+  --ctx-ux-border:        #7c3aed;
+  --ctx-ux-tint:          #150c2e;
+  --ctx-business-border:  #334155;
+  --ctx-business-tint:    #0f1824;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html {
+  font-size: 16px; /* user-adjustable via JS — never override inline */
+  scroll-behavior: smooth;
+}
+body {
+  font-family: var(--ds-font);
+  font-size: var(--ds-text-base);
+  background: var(--ds-bg);
+  color: var(--ds-text-1);
+  line-height: 1.6;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+.ds-layout {
+  display: grid;
+  grid-template-columns: var(--ds-nav-w) 1fr;
+  min-height: 100vh;
+}
+
+/* ── Left nav ─────────────────────────────────────────────────────────────── */
+.ds-nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--ds-nav-bg);
+  border-right: 1px solid var(--ds-nav-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 24px;
+  transition: background 180ms ease, border-color 180ms ease;
+}
+.ds-nav::-webkit-scrollbar { width: 4px; }
+.ds-nav::-webkit-scrollbar-thumb { background: var(--ds-border-strong); border-radius: 999px; }
+
+/* Wordmark area */
+.ds-nav-brand {
+  padding: 20px 20px 18px;
+  border-bottom: 1px solid var(--ds-nav-border);
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.ds-nav-wordmark {
+  font-size: var(--ds-text-lg);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ds-text-1);
+  line-height: 1;
+  display: block;
+}
+.ds-nav-subtitle {
+  font-size: var(--ds-text-xs);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ds-text-3);
+  margin-top: 5px;
+  display: block;
+}
+
+/* Section headers */
+.ds-nav-section {
+  padding: 14px 20px 4px;
+  font-size: var(--ds-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-text-3);
+}
+
+/* Nav links */
+.ds-nav-link {
+  display: block;
+  padding: 6px 20px;
+  font-size: var(--ds-text-sm);
+  font-weight: 500;
+  color: var(--ds-text-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 100ms ease;
+  line-height: 1.4;
+}
+.ds-nav-link:hover {
+  background: var(--ds-surface-sunken);
+  color: var(--ds-text-1);
+}
+.ds-nav-link.is-active {
+  color: var(--ds-accent);
+  background: var(--ds-accent-subtle);
+  border-left-color: var(--ds-accent);
+  font-weight: 600;
+}
+
+/* Controls at bottom of nav */
+.ds-nav-controls {
+  margin-top: auto;
+  padding: 16px 20px 0;
+  border-top: 1px solid var(--ds-nav-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ds-nav-control-label {
+  font-size: var(--ds-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ds-text-3);
+  margin-bottom: 4px;
+}
+
+/* Text size control */
+.ds-size-row {
+  display: flex;
+  gap: 4px;
+}
+.ds-size-btn {
+  flex: 1;
+  padding: 5px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-text-2);
+  font-family: var(--ds-font);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 100ms;
+  text-align: center;
+}
+.ds-size-btn:hover { border-color: var(--ds-border-strong); color: var(--ds-text-1); }
+.ds-size-btn.is-active {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: #fff;
+}
+.ds-size-btn:nth-child(1) { font-size: 0.7rem; }
+.ds-size-btn:nth-child(2) { font-size: 0.8rem; }
+.ds-size-btn:nth-child(3) { font-size: 0.9rem; }
+.ds-size-btn:nth-child(4) { font-size: 1rem; }
+
+/* Theme toggle */
+.ds-theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-text-2);
+  font-family: var(--ds-font);
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 100ms;
+  width: 100%;
+  justify-content: center;
+}
+.ds-theme-btn:hover { border-color: var(--ds-border-strong); color: var(--ds-text-1); }
+
+/* ── Main content ─────────────────────────────────────────────────────────── */
+.ds-main {
+  padding: 48px 56px 80px;
+  max-width: 960px;
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.ds-page-header {
+  margin-bottom: 56px;
+  padding-bottom: 28px;
+  border-bottom: 2px solid var(--ds-border);
+}
+.ds-page-eyebrow {
+  font-size: var(--ds-text-sm);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+  margin-bottom: 8px;
+}
+.ds-page-title {
+  font-size: var(--ds-text-2xl);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ds-text-1);
+  margin-bottom: 12px;
+}
+.ds-page-desc {
+  font-size: var(--ds-text-base);
+  color: var(--ds-text-2);
+  max-width: 62ch;
+  line-height: 1.7;
+}
+
+/* ── Sections ─────────────────────────────────────────────────────────────── */
+.ds-section {
+  margin-bottom: 72px;
+  scroll-margin-top: 28px;
+}
+.ds-section-title {
+  font-size: var(--ds-text-xl);
+  font-weight: 700;
+  color: var(--ds-text-1);
+  margin-bottom: 6px;
+  line-height: 1.15;
+}
+.ds-section-desc {
+  font-size: var(--ds-text-sm);
+  color: var(--ds-text-2);
+  max-width: 64ch;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.ds-subsection {
+  margin-bottom: 36px;
+}
+.ds-subsection-title {
+  font-size: var(--ds-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ds-text-3);
+  margin-bottom: 14px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+/* Preview card */
+.ds-preview {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  box-shadow: var(--ds-shadow-sm);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+.ds-preview--col { flex-direction: column; }
+.ds-preview--center { align-items: center; }
+
+/* Token table */
+.ds-token-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-text-sm);
+}
+.ds-token-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: var(--ds-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ds-text-3);
+  border-bottom: 2px solid var(--ds-border);
+}
+.ds-token-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ds-border);
+  vertical-align: middle;
+}
+.ds-token-table tr:last-child td { border-bottom: none; }
+.ds-token-name {
+  font-family: var(--ds-mono);
+  font-size: 0.8rem;
+  color: var(--ds-accent);
+}
+.ds-token-value {
+  font-family: var(--ds-mono);
+  font-size: 0.8rem;
+  color: var(--ds-text-3);
+}
+
+/* Color swatch row */
+.ds-swatch-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+.ds-swatch-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.ds-swatch-chip {
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.ds-swatch-chip--outline { border: 2px solid; }
+.ds-swatch-label {
+  font-family: var(--ds-mono);
+  font-size: 0.7rem;
+  color: var(--ds-text-3);
+  text-align: center;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Type scale samples */
+.ds-type-table { width: 100%; border-collapse: collapse; }
+.ds-type-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  align-items: baseline;
+  gap: 20px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--ds-border);
+}
+.ds-type-token { font-family: var(--ds-mono); font-size: var(--ds-text-xs); color: var(--ds-text-3); }
+.ds-type-value { font-family: var(--ds-mono); font-size: var(--ds-text-xs); color: var(--ds-text-4); text-align: right; }
+
+/* Code blocks */
+.ds-code {
+  font-family: var(--ds-mono);
+  font-size: 0.85rem;
+  background: var(--ds-surface-sunken);
+  border: 1px solid var(--ds-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--ds-text-1);
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 8px;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   ATLAS COMPONENT STYLES
+   These are the canonical component definitions. Column gallery imports these.
+═════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Badges ───────────────────────────────────────────────────────────────── */
+.atlas-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--comp-font);
+  font-size: var(--comp-sm); font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; line-height: 1;
+  padding: 4px 8px 2px; /* asymmetric: uppercase glyphs sit high in the em square */
+  border-radius: var(--badge-radius-pill);
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.atlas-badge--group   { background: #0f172a; color: #ffffff; }
+.atlas-badge--context { background: rgba(255,255,255,0.94); color: var(--atlas-text-1); border-color: var(--atlas-border-strong); }
+.atlas-badge--lens    { background: rgba(255,255,255,0.80); color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.atlas-badge--kind    { border-radius: var(--badge-radius-tag); background: #cbd5e1; color: #1e293b; border-color: #bfcad7; font-size: var(--comp-2xs); letter-spacing: 0.08em; padding: 4px 6px 2px; }
+.atlas-badge--kind-command { background: #dbeafe; color: #1e3a8a; border-color: var(--cmd-border); }
+.atlas-badge--kind-view    { background: #dcfce7; color: #14532d; border-color: var(--view-border); }
+.atlas-badge--kind-event   { background: #ffedd5; color: #9a3412; border-color: var(--evt-border); }
+.atlas-badge--actor        { background: #eff6ff; color: #1e3a8a; border-color: #bfdbfe; }
+.atlas-badge--actor-system { background: #f8fafc; color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.atlas-badge--status       { border-radius: var(--badge-radius-tag); font-size: var(--comp-2xs); padding: 4px 6px 2px; }
+.atlas-badge--specified    { background: #dcfce7; color: #166534; border-color: var(--view-border); }
+.atlas-badge--draft        { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+.atlas-badge--nospec       { background: #f1f5f9; color: var(--atlas-text-3); border-color: var(--atlas-border); }
+
+[data-theme="dark"] .atlas-badge--group    { background: #1e293b; color: #e2e8f0; }
+[data-theme="dark"] .atlas-badge--context  { background: rgba(30,46,69,0.94); color: var(--atlas-text-1); border-color: var(--atlas-border-strong); }
+[data-theme="dark"] .atlas-badge--lens     { background: rgba(20,34,54,0.80); color: var(--atlas-text-2); border-color: var(--atlas-border); }
+[data-theme="dark"] .atlas-badge--kind     { background: #1e293b; color: #94a3b8; border-color: #273f5c; }
+[data-theme="dark"] .atlas-badge--actor    { background: #0c1e3b; color: #93c5fd; border-color: #1e3a6e; }
+[data-theme="dark"] .atlas-badge--nospec   { background: #111e30; color: var(--atlas-text-3); border-color: var(--atlas-border); }
+
+/* ── Entity boxes ─────────────────────────────────────────────────────────── */
+.atlas-entity { border-radius: var(--box-radius); border: 2px solid; overflow: hidden; }
+.atlas-entity--command { background: var(--cmd-bg);  border-color: var(--cmd-border);  }
+.atlas-entity--event   { background: var(--evt-bg);  border-color: var(--evt-border);  }
+.atlas-entity--view    { background: var(--view-bg); border-color: var(--view-border); }
+.atlas-entity__header  { padding: 3px 8px; display: flex; align-items: center; gap: 6px; }
+.atlas-entity--command .atlas-entity__header { background: var(--cmd-header);  }
+.atlas-entity--event   .atlas-entity__header { background: var(--evt-header);  }
+.atlas-entity--view    .atlas-entity__header { background: var(--view-header); }
+.atlas-entity__type { font-size: var(--comp-2xs); font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; color: rgba(255,255,255,0.92); }
+.atlas-entity__name { padding: 6px 8px 5px; font-size: var(--comp-base); font-weight: 700; line-height: 1.2; color: var(--atlas-text-1); }
+.atlas-entity__fields { margin: 0; padding: 0 8px 7px; list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.atlas-entity__field { font-family: var(--comp-mono); font-size: var(--comp-xs); line-height: 1.4; color: var(--atlas-text-2); }
+.atlas-entity__field-value { color: var(--atlas-text-3); font-weight: 400; }
+
+/* ── Thumbnails ───────────────────────────────────────────────────────────── */
+.atlas-thumb { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.atlas-thumb__device { width: 68px; border-radius: 13px; border: 1.5px solid var(--atlas-border-strong); background: #fff; box-shadow: 0 4px 14px rgba(15,23,42,0.12); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 120ms; }
+[data-theme="dark"] .atlas-thumb__device { background: #1a2a3d; border-color: var(--atlas-border-strong); }
+.atlas-thumb:hover .atlas-thumb__device { box-shadow: 0 6px 18px rgba(15,23,42,0.22); }
+.atlas-thumb__notch { width: 22px; height: 3px; border-radius: 999px; background: var(--atlas-border-strong); align-self: center; margin: 4px 0 2px; flex-shrink: 0; }
+.atlas-thumb__screen { display: flex; flex-direction: column; flex: 1; }
+.atlas-thumb__bar { height: 9px; flex-shrink: 0; }
+.atlas-thumb__bar--ll { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.atlas-thumb__body { flex: 1; padding: 5px 4px 6px; display: flex; flex-direction: column; gap: 4px; }
+.atlas-thumb__name { font-size: var(--comp-xs); font-weight: 700; letter-spacing: 0.04em; color: var(--atlas-text-2); text-align: center; }
+.atlas-thumb__field  { height: 10px; border-radius: 4px; background: #e9eff6; border: 1px solid var(--atlas-border); }
+.atlas-thumb__block  { height: 6px; border-radius: 3px; background: #e2e8f0; }
+.atlas-thumb__chip-row { display: flex; gap: 2px; }
+.atlas-thumb__chip   { flex: 1; height: 13px; border-radius: 4px; border: 1px solid var(--atlas-border); background: #fff; }
+.atlas-thumb__chip--sel  { background: #fff7ed; border-color: #fdba74; }
+.atlas-thumb__chip--sel2 { background: #ede9fe; border-color: #c4b5fd; }
+.atlas-thumb__btn         { height: 12px; border-radius: 4px; }
+.atlas-thumb__btn--primary  { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.atlas-thumb__btn--success  { background: linear-gradient(135deg, #34d399, #10b981); }
+.atlas-thumb__btn--disabled { background: #e2e8f0; }
+.atlas-thumb__summary-bar { height: 14px; border-radius: 4px; background: #fff7ed; border: 1px solid #fdba74; }
+.atlas-thumb__card  { height: 16px; border-radius: 4px; background: #fff; border: 1px solid var(--atlas-border); border-left: 3px solid var(--atlas-border-strong); }
+.atlas-thumb__card--logged { border-left-color: #86efac; }
+.atlas-thumb__price-row { display: flex; align-items: center; gap: 3px; }
+.atlas-thumb__price-sym { width: 8px; height: 12px; border-radius: 2px; background: #94a3b8; }
+.atlas-thumb__price-val { flex: 1; height: 12px; border-radius: 3px; border: 1px solid var(--atlas-border); background: #fff; }
+.atlas-thumb--none .atlas-thumb__device { border-style: dashed; background: var(--atlas-bg); box-shadow: none; align-items: center; justify-content: center; min-height: 82px; gap: 4px; }
+.atlas-thumb--none:hover .atlas-thumb__device { box-shadow: none; }
+.atlas-thumb__none-icon  { font-size: 1.4rem; color: var(--atlas-text-4); }
+.atlas-thumb__none-label { font-size: var(--comp-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--atlas-text-4); }
+
+/* ── Lens toggle ──────────────────────────────────────────────────────────── */
+.atlas-lens-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 30px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--atlas-border-strong);
+  background: var(--atlas-surface); color: var(--atlas-text-2);
+  font-family: var(--comp-font); font-size: var(--comp-sm); font-weight: 700;
+  letter-spacing: 0.04em; cursor: pointer; transition: all 100ms ease;
+}
+.atlas-lens-btn:hover { border-color: var(--atlas-border); }
+.atlas-lens-btn.is-active { background: var(--atlas-text-1); border-color: var(--atlas-text-1); color: #fff; }
+.atlas-lens-btn.is-active[data-lens="lifecycle"] { background: var(--ctx-lifecycle-border); border-color: var(--ctx-lifecycle-border); }
+.atlas-lens-btn.is-active[data-lens="runtime"]   { background: var(--ctx-runtime-border);   border-color: var(--ctx-runtime-border);   }
+.atlas-lens-btn.is-active[data-lens="ux"]        { background: var(--ctx-ux-border);        border-color: var(--ctx-ux-border);        }
+.atlas-lens-btn.is-active[data-lens="aem"]       { background: var(--ctx-business-border);  border-color: var(--ctx-business-border);  }
+
+/* ── Shell header ─────────────────────────────────────────────────────────── */
+.atlas-shell-header {
+  background: var(--atlas-surface);
+  border-bottom: 1px solid var(--atlas-border);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  transition: background 180ms ease, border-color 180ms ease;
+}
+.atlas-shell-header__wordmark { font-size: var(--comp-md); font-weight: 700; letter-spacing: 0.06em; color: var(--atlas-text-1); }
+.atlas-shell-header__sep { width: 1px; height: 18px; background: var(--atlas-border-strong); flex-shrink: 0; }
+.atlas-shell-header__path-eyebrow { font-size: var(--comp-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--atlas-text-3); }
+.atlas-shell-header__path-name { font-size: var(--comp-base); font-weight: 700; color: var(--atlas-text-1); }
+.atlas-shell-header__controls { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+<div class="ds-layout">
+
+  <!-- ════════════════════════════════════════════════════
+       LEFT NAV
+  ════════════════════════════════════════════════════ -->
+  <nav class="ds-nav" id="ds-nav">
+
+    <div class="ds-nav-brand">
+      <span class="ds-nav-wordmark">ATLAS</span>
+      <span class="ds-nav-subtitle">Design System</span>
+    </div>
+
+    <div class="ds-nav-section">Foundation</div>
+    <a class="ds-nav-link" href="#chrome">Colors — Chrome</a>
+    <a class="ds-nav-link" href="#entity-types">Colors — Entity Types</a>
+    <a class="ds-nav-link" href="#contexts">Colors — Contexts</a>
+    <a class="ds-nav-link" href="#typography">Typography</a>
+
+    <div class="ds-nav-section">Components</div>
+    <a class="ds-nav-link" href="#badges">Badges</a>
+    <a class="ds-nav-link" href="#entity-boxes">Entity Boxes</a>
+    <a class="ds-nav-link" href="#thumbnails">Screen Thumbnails</a>
+    <a class="ds-nav-link" href="#lens-toggles">Lens Toggles</a>
+
+    <div class="ds-nav-section">Layout</div>
+    <a class="ds-nav-link" href="#shell">Shell Header</a>
+    <a class="ds-nav-link" href="#geometry">Geometry Reference</a>
+
+    <div class="ds-nav-controls">
+
+      <!-- Text size -->
+      <div>
+        <div class="ds-nav-control-label">Text size</div>
+        <div class="ds-size-row" id="size-controls">
+          <button class="ds-size-btn" data-size="13" title="Small (13px)">S</button>
+          <button class="ds-size-btn is-active" data-size="16" title="Default (16px)">M</button>
+          <button class="ds-size-btn" data-size="19" title="Large (19px)">L</button>
+          <button class="ds-size-btn" data-size="22" title="Extra large (22px)">XL</button>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <button class="ds-theme-btn" id="theme-toggle" type="button">
+        <span id="theme-icon">☀</span>
+        <span id="theme-label">Light mode</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════════ -->
+  <main class="ds-main">
+
+    <header class="ds-page-header">
+      <div class="ds-page-eyebrow">NEXUS ATLAS</div>
+      <h1 class="ds-page-title">Design System</h1>
+      <p class="ds-page-desc">
+        Canonical tokens and components for the ATLAS model viewer.
+        All components reference these values — nothing is invented at the
+        component level. Target: tablet minimum, laptop/desktop typical.
+        Base text: 16 px (browser default), user-adjustable via size control in nav.
+      </p>
+    </header>
+
+    <!-- ── Chrome colors ────────────────────────────────────────────────── -->
+    <section class="ds-section" id="chrome">
+      <h2 class="ds-section-title">Colors — Chrome</h2>
+      <p class="ds-section-desc">The neutral shell palette. Backgrounds, surfaces, borders, and text scale for the viewer itself. Switches between light and dark modes.</p>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Backgrounds &amp; Surfaces</div>
+        <div class="ds-preview ds-preview--col">
+          <div class="ds-swatch-row">
+            <div class="ds-swatch-cell">
+              <div class="ds-swatch-chip" style="background:#eef2f7;border:1px solid #dbe5f1"></div>
+              <div class="ds-swatch-label">--atlas-bg<br>#eef2f7</div>
+            </div>
+            <div class="ds-swatch-cell">
+              <div class="ds-swatch-chip" style="background:#ffffff;border:1px solid #dbe5f1"></div>
+              <div class="ds-swatch-label">--atlas-surface<br>#ffffff</div>
+            </div>
+            <div class="ds-swatch-cell">
+              <div class="ds-swatch-chip" style="background:#dbe5f1"></div>
+              <div class="ds-swatch-label">--atlas-border<br>#dbe5f1</div>
+            </div>
+            <div class="ds-swatch-cell">
+              <div class="ds-swatch-chip" style="background:#c2d4e8"></div>
+              <div class="ds-swatch-label">--atlas-border-strong<br>#c2d4e8</div>
+            </div>
+          </div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-style:italic">Dark mode equivalents: bg #0a1628 · surface #111e30 · border #1c2e45 · border-strong #273f5c</div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Text Scale</div>
+        <div class="ds-preview">
+          <table class="ds-token-table" style="width:100%">
+            <thead><tr><th>Token</th><th>Sample</th><th>Hex (light)</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td class="ds-token-name">--atlas-text-1</td><td style="color:#0d2440;font-weight:700">Primary text</td><td class="ds-token-value">#0d2440</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Column titles, entity names</td></tr>
+              <tr><td class="ds-token-name">--atlas-text-2</td><td style="color:#48627f">Secondary text</td><td class="ds-token-value">#48627f</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Descriptions, field text</td></tr>
+              <tr><td class="ds-token-name">--atlas-text-3</td><td style="color:#7a96b0">Muted text</td><td class="ds-token-value">#7a96b0</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Step numbers, helper labels</td></tr>
+              <tr><td class="ds-token-name">--atlas-text-4</td><td style="color:#a8bfd6">Disabled / placeholder</td><td class="ds-token-value">#a8bfd6</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Empty states, inactive</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Entity type colors ────────────────────────────────────────────── -->
+    <section class="ds-section" id="entity-types">
+      <h2 class="ds-section-title">Colors — Entity Types</h2>
+      <p class="ds-section-desc">Semantic colors for Command, Event, and View. Fixed across all apps ATLAS renders. These carry meaning — the model viewer does not reuse them for decoration.</p>
+
+      <div class="ds-preview">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;width:100%">
+
+          <!-- Command -->
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;color:var(--ds-text-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">Command — Blue</div>
+            <div class="ds-swatch-row" style="margin-bottom:8px">
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:rgba(59,130,246,0.11);border:2px solid #93c5fd"></div>
+                <div class="ds-swatch-label">bg</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#93c5fd"></div>
+                <div class="ds-swatch-label">border</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#1d4ed8"></div>
+                <div class="ds-swatch-label">header</div>
+              </div>
+            </div>
+            <div class="atlas-entity atlas-entity--command">
+              <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+              <div class="atlas-entity__name">LogExpense</div>
+            </div>
+          </div>
+
+          <!-- Event -->
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;color:var(--ds-text-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">Event — Orange</div>
+            <div class="ds-swatch-row" style="margin-bottom:8px">
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:rgba(249,115,22,0.12);border:2px solid #fdba74"></div>
+                <div class="ds-swatch-label">bg</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#fdba74"></div>
+                <div class="ds-swatch-label">border</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#ea580c"></div>
+                <div class="ds-swatch-label">header</div>
+              </div>
+            </div>
+            <div class="atlas-entity atlas-entity--event">
+              <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+              <div class="atlas-entity__name">LaundryExpenseLogged</div>
+            </div>
+          </div>
+
+          <!-- View -->
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;color:var(--ds-text-2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em">View — Green</div>
+            <div class="ds-swatch-row" style="margin-bottom:8px">
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:rgba(34,197,94,0.10);border:2px solid #86efac"></div>
+                <div class="ds-swatch-label">bg</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#86efac"></div>
+                <div class="ds-swatch-label">border</div>
+              </div>
+              <div class="ds-swatch-cell">
+                <div class="ds-swatch-chip" style="background:#16a34a"></div>
+                <div class="ds-swatch-label">header</div>
+              </div>
+            </div>
+            <div class="atlas-entity atlas-entity--view">
+              <div class="atlas-entity__header"><span class="atlas-entity__type">View</span></div>
+              <div class="atlas-entity__name">RecentExpenses</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Concern context colors ────────────────────────────────────────── -->
+    <section class="ds-section" id="contexts">
+      <h2 class="ds-section-title">Colors — Concern Contexts</h2>
+      <p class="ds-section-desc">Column border color and background tint identify the concern context. Border color carries the semantic weight. Background tint is subtle — the entity boxes dominate the interior.</p>
+
+      <div class="ds-preview">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;width:100%">
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;margin-bottom:8px;color:#1e40af">Lifecycle</div>
+            <div class="ds-swatch-row" style="margin-bottom:6px">
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#1e40af"></div><div class="ds-swatch-label">border<br>#1e40af</div></div>
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#dbeafe;border:1px solid #93c5fd"></div><div class="ds-swatch-label">tint<br>#dbeafe</div></div>
+            </div>
+            <div style="height:40px;border-radius:10px;border:4px solid #1e40af;background:linear-gradient(180deg,#dbeafe,#f0f7ff)"></div>
+          </div>
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;margin-bottom:8px;color:#0e7490">Runtime</div>
+            <div class="ds-swatch-row" style="margin-bottom:6px">
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#0e7490"></div><div class="ds-swatch-label">border<br>#0e7490</div></div>
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#e0f2fe;border:1px solid #7dd3fc"></div><div class="ds-swatch-label">tint<br>#e0f2fe</div></div>
+            </div>
+            <div style="height:40px;border-radius:10px;border:4px solid #0e7490;background:linear-gradient(180deg,#e0f2fe,#f0fbff)"></div>
+          </div>
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;margin-bottom:8px;color:#6d28d9">UX</div>
+            <div class="ds-swatch-row" style="margin-bottom:6px">
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#6d28d9"></div><div class="ds-swatch-label">border<br>#6d28d9</div></div>
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#ede9fe;border:1px solid #c4b5fd"></div><div class="ds-swatch-label">tint<br>#ede9fe</div></div>
+            </div>
+            <div style="height:40px;border-radius:10px;border:4px solid #6d28d9;background:linear-gradient(180deg,#ede9fe,#faf8ff)"></div>
+          </div>
+          <div>
+            <div style="font-size:var(--ds-text-sm);font-weight:700;margin-bottom:8px;color:#15263d">Business</div>
+            <div class="ds-swatch-row" style="margin-bottom:6px">
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#15263d"></div><div class="ds-swatch-label">border<br>#15263d</div></div>
+              <div class="ds-swatch-cell"><div class="ds-swatch-chip" style="background:#f4f6fa;border:1px solid #dbe5f1"></div><div class="ds-swatch-label">tint<br>#f4f6fa</div></div>
+            </div>
+            <div style="height:40px;border-radius:10px;border:4px solid #15263d;background:linear-gradient(180deg,#f4f6fa,#ffffff)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Typography ────────────────────────────────────────────────────── -->
+    <section class="ds-section" id="typography">
+      <h2 class="ds-section-title">Typography</h2>
+      <p class="ds-section-desc">Two typefaces. IBM Plex Sans for all UI text. IBM Plex Mono for field names, property values, code, and anything requiring character-level alignment. All sizes are rem — relative to the user's chosen text size.</p>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Document shell scale (DS page)</div>
+        <div class="ds-preview ds-preview--col">
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-xs</span><span style="font-size:0.75rem;font-weight:600;letter-spacing:0.10em;text-transform:uppercase">Section heading · Badge label · Control label</span><span class="ds-type-value">0.75 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-sm</span><span style="font-size:0.875rem">Nav links · Descriptions · Table body</span><span class="ds-type-value">0.875 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-base</span><span style="font-size:1rem">Body copy · Default text</span><span class="ds-type-value">1 rem (16 px)</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-md</span><span style="font-size:1.125rem;font-weight:700">Subsection titles</span><span class="ds-type-value">1.125 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-lg</span><span style="font-size:1.375rem;font-weight:700">Nav wordmark · Section title</span><span class="ds-type-value">1.375 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-xl</span><span style="font-size:1.75rem;font-weight:700">Major section heading</span><span class="ds-type-value">1.75 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--ds-text-2xl</span><span style="font-size:2.25rem;font-weight:700">Page title</span><span class="ds-type-value">2.25 rem</span></div>
+        </div>
+      </div>
+
+      <div class="ds-subsection">
+        <div class="ds-subsection-title">Component scale (column cards — dense, fixed)</div>
+        <p style="font-size:var(--ds-text-sm);color:var(--ds-text-2);margin-bottom:14px">Component text does not scale with the user text size control — column cards have fixed compact density optimised for modeling boards on large screens.</p>
+        <div class="ds-preview ds-preview--col">
+          <div class="ds-type-row"><span class="ds-type-token">--comp-2xs</span><span style="font-size:0.50rem;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;font-family:var(--comp-font)">KIND TAG · STEP NUMBER</span><span class="ds-type-value">0.50 rem / ~8 px</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--comp-xs</span><span style="font-size:0.56rem;font-weight:700;font-family:var(--comp-font)">Step 01 · Thumbnail label</span><span class="ds-type-value">0.56 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--comp-sm</span><span style="font-size:0.64rem;font-family:var(--comp-font)">Badge label · Lens toggle</span><span class="ds-type-value">0.64 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--comp-base</span><span style="font-size:0.72rem;font-family:var(--comp-font)">Column description · Entity name · Body text</span><span class="ds-type-value">0.72 rem / ~11.5 px</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--comp-md</span><span style="font-size:0.84rem;font-weight:700;font-family:var(--comp-font)">Column title</span><span class="ds-type-value">0.84 rem</span></div>
+          <div class="ds-type-row"><span class="ds-type-token">--comp-mono</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.64rem">machineType · unitPrice · lineTotal</span><span class="ds-type-value">IBM Plex Mono</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Badges ────────────────────────────────────────────────────────── -->
+    <section class="ds-section" id="badges">
+      <h2 class="ds-section-title">Badges</h2>
+      <p class="ds-section-desc">Non-interactive classification labels. Every badge has a specific semantic role — they are not decorative. Interactive triggers (clickable pills that open popovers) use <code style="font-family:var(--ds-mono);font-size:0.85em">&lt;button&gt;</code> but share the same visual treatment.</p>
+
+      <div class="ds-preview ds-preview--col" style="gap:20px">
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">Context Group — coarse cluster label</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--group">App Runtime</span>
+            <span class="atlas-badge atlas-badge--group">Business</span>
+            <span class="atlas-badge atlas-badge--group">UX / Interaction</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Dark solid pill. Identifies the coarse group a column belongs to. Always leftmost in the classification row.</p>
+        </div>
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">Bounded Context — ownership boundary</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--context">ApplicationLifecycle</span>
+            <span class="atlas-badge atlas-badge--context">RuntimeOrchestration</span>
+            <span class="atlas-badge atlas-badge--context">Domain</span>
+            <span class="atlas-badge atlas-badge--context">UX</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Light outlined pill. Identifies which bounded context owns the meaning of this step.</p>
+        </div>
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">Lens — cross-cutting view filter</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--lens">Lifecycle</span>
+            <span class="atlas-badge atlas-badge--lens">Runtime</span>
+            <span class="atlas-badge atlas-badge--lens">Screen</span>
+            <span class="atlas-badge atlas-badge--lens">AEM</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Faintest badge. Identifies which lens shows this column. Multiple lenses possible per column.</p>
+        </div>
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">Column Kind — square tag, semantic color</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--kind">SLICE</span>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-event">EVENT</span>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-view">VIEW</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Square corner tag. Always right-aligned in the classification row. Color matches the entity type palette.</p>
+        </div>
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">Actor</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+            <span class="atlas-badge atlas-badge--actor">Modeler</span>
+            <span class="atlas-badge atlas-badge--actor-system">System</span>
+            <span class="atlas-badge atlas-badge--actor-system">Automation</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Blue tint = human actor. Neutral = system/automation actor.</p>
+        </div>
+
+        <div class="ds-subsection" style="margin-bottom:0">
+          <div class="ds-subsection-title">GWT Status — square tag</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+            <span class="atlas-badge atlas-badge--status atlas-badge--draft">Draft</span>
+            <span class="atlas-badge atlas-badge--status atlas-badge--nospec">No spec</span>
+          </div>
+          <p style="font-size:var(--ds-text-xs);color:var(--ds-text-3);margin-top:8px">Shown in the GWT zone when GWT is collapsed. Green = spec exists and is complete. Yellow = in progress. Grey = infrastructure slice, no spec expected.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Entity boxes ──────────────────────────────────────────────────── -->
+    <section class="ds-section" id="entity-boxes">
+      <h2 class="ds-section-title">Entity Boxes</h2>
+      <p class="ds-section-desc">The primary model content inside each column. Command (blue), Event (orange), View (green). Structure: colored header bar with type label, then entity name, then optional field list in monospace.</p>
+
+      <div class="ds-preview" style="gap:24px;flex-wrap:wrap">
+
+        <!-- Command, minimal -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Command — minimal</div>
+          <div class="atlas-entity atlas-entity--command" style="width:200px">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">SetLocation</div>
+          </div>
+        </div>
+
+        <!-- Command, with fields -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Command — with fields</div>
+          <div class="atlas-entity atlas-entity--command" style="width:200px">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">LogExpense</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType</li>
+              <li class="atlas-entity__field">quantity</li>
+              <li class="atlas-entity__field">unitPrice</li>
+              <li class="atlas-entity__field">payment</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Command, with values (expanded) -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Command — expanded (values)</div>
+          <div class="atlas-entity atlas-entity--command" style="width:230px">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">LogExpense</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType <span class="atlas-entity__field-value">= Washer</span></li>
+              <li class="atlas-entity__field">quantity    <span class="atlas-entity__field-value">= 1</span></li>
+              <li class="atlas-entity__field">unitPrice   <span class="atlas-entity__field-value">= 3.00</span></li>
+              <li class="atlas-entity__field">payment     <span class="atlas-entity__field-value">= Cash</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Event -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Event — with fields</div>
+          <div class="atlas-entity atlas-entity--event" style="width:210px">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">LaundryExpenseLogged</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">location</li>
+              <li class="atlas-entity__field">machineType</li>
+              <li class="atlas-entity__field">lineTotal</li>
+              <li class="atlas-entity__field">payment</li>
+              <li class="atlas-entity__field">occurredAt</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- View -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">View — with fields</div>
+          <div class="atlas-entity atlas-entity--view" style="width:200px">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">View</span></div>
+            <div class="atlas-entity__name">RecentExpenses</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">sessionTotal</li>
+              <li class="atlas-entity__field">entries[ ]</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Thumbnails ────────────────────────────────────────────────────── -->
+    <section class="ds-section" id="thumbnails">
+      <h2 class="ds-section-title">Screen Thumbnails</h2>
+      <p class="ds-section-desc">Anchor references to Screen State Catalog entries. Clicking opens a modal (quick preview) or navigates to the screen state page. The device frame and abstract content hint at the screen — content is not duplicated here.</p>
+
+      <div class="ds-preview" style="gap:28px;flex-wrap:wrap;align-items:flex-end">
+
+        <!-- No screen -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">No screen — system internal</div>
+          <div class="atlas-thumb atlas-thumb--none">
+            <div class="atlas-thumb__device"><div class="atlas-thumb__none-icon">⚡</div><div class="atlas-thumb__none-label">Pre-UI</div></div>
+            <span class="atlas-thumb__name">No surface</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">No screen — runtime</div>
+          <div class="atlas-thumb atlas-thumb--none">
+            <div class="atlas-thumb__device"><div class="atlas-thumb__none-icon">⚙</div><div class="atlas-thumb__none-label">Internal</div></div>
+            <span class="atlas-thumb__name">No surface</span>
+          </div>
+        </div>
+
+        <!-- With screen -->
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">NeedLocation</div>
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__field"></div>
+                  <div class="atlas-thumb__block" style="width:40%"></div>
+                  <div style="flex:1"></div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">NeedLocation</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">EntryForm — chips</div>
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__chip-row"><div class="atlas-thumb__chip atlas-thumb__chip--sel"></div><div class="atlas-thumb__chip"></div><div class="atlas-thumb__chip"></div></div>
+                  <div class="atlas-thumb__field" style="width:70%"></div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--disabled"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">EntryForm</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">ReadyToLog</div>
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__chip-row"><div class="atlas-thumb__chip atlas-thumb__chip--sel"></div><div class="atlas-thumb__chip"></div><div class="atlas-thumb__chip"></div></div>
+                  <div class="atlas-thumb__field" style="width:70%"></div>
+                  <div class="atlas-thumb__chip-row"><div class="atlas-thumb__chip atlas-thumb__chip--sel2"></div><div class="atlas-thumb__chip"></div><div class="atlas-thumb__chip"></div><div class="atlas-thumb__chip"></div></div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">SessionView</div>
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__summary-bar"></div>
+                  <div class="atlas-thumb__card atlas-thumb__card--logged"></div>
+                  <div class="atlas-thumb__card atlas-thumb__card--logged"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">SessionView</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Lens toggles ──────────────────────────────────────────────────── -->
+    <section class="ds-section" id="lens-toggles">
+      <h2 class="ds-section-title">Lens Toggles</h2>
+      <p class="ds-section-desc">Header controls that show or hide column groups by concern context. Each lens has a context-tinted active state matching its column border color.</p>
+
+      <div class="ds-preview" style="gap:12px;flex-direction:column">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;width:80px">All active</span>
+          <button class="atlas-lens-btn is-active" data-lens="lifecycle" type="button">Lifecycle</button>
+          <button class="atlas-lens-btn is-active" data-lens="runtime"   type="button">Runtime</button>
+          <button class="atlas-lens-btn is-active" data-lens="ux"        type="button">Screen</button>
+          <button class="atlas-lens-btn is-active" data-lens="aem"       type="button">AEM</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;width:80px">AEM only</span>
+          <button class="atlas-lens-btn" data-lens="lifecycle" type="button">Lifecycle</button>
+          <button class="atlas-lens-btn" data-lens="runtime"   type="button">Runtime</button>
+          <button class="atlas-lens-btn" data-lens="ux"        type="button">Screen</button>
+          <button class="atlas-lens-btn is-active" data-lens="aem" type="button">AEM</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:var(--ds-text-xs);color:var(--ds-text-3);font-weight:600;width:80px">All inactive</span>
+          <button class="atlas-lens-btn" data-lens="lifecycle" type="button">Lifecycle</button>
+          <button class="atlas-lens-btn" data-lens="runtime"   type="button">Runtime</button>
+          <button class="atlas-lens-btn" data-lens="ux"        type="button">Screen</button>
+          <button class="atlas-lens-btn" data-lens="aem"       type="button">AEM</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Shell header ──────────────────────────────────────────────────── -->
+    <section class="ds-section" id="shell">
+      <h2 class="ds-section-title">Shell Header</h2>
+      <p class="ds-section-desc">Fixed top bar for the document shell. ATLAS wordmark left, current project + PATH context center-left, lens controls right. Stays visible while the column flow scrolls horizontally below.</p>
+
+      <div class="ds-preview ds-preview--col">
+        <div style="border-radius:10px;overflow:hidden;border:1px solid var(--atlas-border);box-shadow:var(--ds-shadow-sm)">
+          <div class="atlas-shell-header">
+            <span class="atlas-shell-header__wordmark">ATLAS</span>
+            <div class="atlas-shell-header__sep"></div>
+            <span class="atlas-shell-header__path-eyebrow">LaundryLog · PATH1</span>
+            <span class="atlas-shell-header__path-name">Fresh Launch — No Location — First Entry</span>
+            <div class="atlas-shell-header__controls">
+              <button class="atlas-lens-btn is-active" data-lens="lifecycle" type="button">Lifecycle</button>
+              <button class="atlas-lens-btn is-active" data-lens="runtime"   type="button">Runtime</button>
+              <button class="atlas-lens-btn is-active" data-lens="ux"        type="button">Screen</button>
+              <button class="atlas-lens-btn is-active" data-lens="aem"       type="button">AEM</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Geometry reference ────────────────────────────────────────────── -->
+    <section class="ds-section" id="geometry">
+      <h2 class="ds-section-title">Geometry Reference</h2>
+      <p class="ds-section-desc">Fixed dimensional values for column cards and detail boxes. These are pixel values — they do not scale with user text size. Column cards are consistently sized across the flow to enable visual comparison.</p>
+
+      <div class="ds-preview ds-preview--col">
+        <table class="ds-token-table">
+          <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td class="ds-token-name">--col-w</td><td class="ds-token-value">292 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Normal (1×) column width</td></tr>
+            <tr><td class="ds-token-name">--col-w-2x</td><td class="ds-token-value">602 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Expanded (2×) column: 2 × 292 + 18 gap</td></tr>
+            <tr><td class="ds-token-name">--col-radius</td><td class="ds-token-value">24 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Column card corner radius</td></tr>
+            <tr><td class="ds-token-name">--col-border-w</td><td class="ds-token-value">4 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Column border (concern context color)</td></tr>
+            <tr><td class="ds-token-name">--col-pad</td><td class="ds-token-value">10 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Column inner padding</td></tr>
+            <tr><td class="ds-token-name">--col-gap</td><td class="ds-token-value">18 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Gap between columns in the flow</td></tr>
+            <tr><td class="ds-token-name">--box-radius</td><td class="ds-token-value">14 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Entity box corner radius</td></tr>
+            <tr><td class="ds-token-name">--badge-radius-pill</td><td class="ds-token-value">999 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Context group, context, lens, actor badges</td></tr>
+            <tr><td class="ds-token-name">--badge-radius-tag</td><td class="ds-token-value">4 px</td><td style="font-size:var(--ds-text-sm);color:var(--ds-text-2)">Kind and status badges (square tag)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ── Theme toggle ──────────────────────────────────────────────────────────── */
+const html = document.documentElement;
+const themeBtn = document.getElementById('theme-toggle');
+const themeIcon = document.getElementById('theme-icon');
+const themeLabel = document.getElementById('theme-label');
+
+function applyTheme(dark) {
+  html.setAttribute('data-theme', dark ? 'dark' : 'light');
+  themeIcon.textContent  = dark ? '●' : '☀';
+  themeLabel.textContent = dark ? 'Dark mode' : 'Light mode';
+  try { localStorage.setItem('atlas-ds-theme', dark ? 'dark' : 'light'); } catch(e) {}
+}
+
+themeBtn.addEventListener('click', () => {
+  applyTheme(html.getAttribute('data-theme') !== 'dark');
+});
+
+// Restore saved theme
+try {
+  const saved = localStorage.getItem('atlas-ds-theme');
+  if (saved === 'dark') applyTheme(true);
+} catch(e) {}
+
+/* ── Text size control ─────────────────────────────────────────────────────── */
+const sizeBtns = document.querySelectorAll('.ds-size-btn');
+const sizes = { 13: 'S', 16: 'M', 19: 'L', 22: 'XL' };
+
+function applySize(px) {
+  html.style.fontSize = px + 'px';
+  sizeBtns.forEach(b => {
+    b.classList.toggle('is-active', parseInt(b.dataset.size) === px);
+  });
+  try { localStorage.setItem('atlas-ds-size', px); } catch(e) {}
+}
+
+sizeBtns.forEach(btn => {
+  btn.addEventListener('click', () => applySize(parseInt(btn.dataset.size)));
+});
+
+// Restore saved size (default 16)
+try {
+  const saved = parseInt(localStorage.getItem('atlas-ds-size'));
+  if ([13, 16, 19, 22].includes(saved)) applySize(saved);
+} catch(e) {}
+
+/* ── Active nav link — IntersectionObserver ────────────────────────────────── */
+const sections = document.querySelectorAll('.ds-section[id]');
+const navLinks  = document.querySelectorAll('.ds-nav-link');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(link => {
+        link.classList.toggle('is-active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS Column Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOKENS — from atlas-design-system.html
+───────────────────────────────────────────────────────────────────────────── */
+:root {
+  --atlas-bg:               #eef2f7;
+  --atlas-surface:          #ffffff;
+  --atlas-border:           #dbe5f1;
+  --atlas-border-strong:    #c2d4e8;
+  --atlas-text-1:           #0d2440;
+  --atlas-text-2:           #48627f;
+  --atlas-text-3:           #7a96b0;
+  --atlas-text-4:           #a8bfd6;
+
+  --cmd-bg:                 rgba(59, 130, 246, 0.11);
+  --cmd-border:             #93c5fd;
+  --cmd-header:             #1d4ed8;
+  --evt-bg:                 rgba(249, 115, 22, 0.12);
+  --evt-border:             #fdba74;
+  --evt-header:             #ea580c;
+  --view-bg:                rgba(34, 197, 94, 0.10);
+  --view-border:            #86efac;
+  --view-header:            #16a34a;
+
+  --ctx-lifecycle-border:   #1e40af;
+  --ctx-lifecycle-tint:     #dbeafe;
+  --ctx-runtime-border:     #0e7490;
+  --ctx-runtime-tint:       #e0f2fe;
+  --ctx-ux-border:          #6d28d9;
+  --ctx-ux-tint:            #ede9fe;
+  --ctx-business-border:    #15263d;
+  --ctx-business-tint:      #f4f6fa;
+
+  --col-w:                  292px;
+  --col-radius:             24px;
+  --col-border-w:           4px;
+  --col-pad:                10px;
+  --col-gap:                18px;
+
+  --box-radius:             14px;
+  --badge-radius-pill:      999px;
+  --badge-radius-tag:       4px;
+
+  --col-shadow:             0 10px 24px rgba(10, 27, 49, 0.10);
+
+  --font-sans:              "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono:              "IBM Plex Mono", "Cascadia Code", monospace;
+
+  --text-2xs:  0.50rem;
+  --text-xs:   0.56rem;
+  --text-sm:   0.64rem;
+  --text-base: 0.72rem;
+  --text-md:   0.84rem;
+  --text-lg:   1.00rem;
+  --text-xl:   1.20rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE
+───────────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--atlas-bg);
+  color: var(--atlas-text-1);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOCUMENT SHELL
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-shell {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  min-height: 100vh;
+}
+.atlas-shell__header {
+  background: var(--atlas-surface);
+  border-bottom: 1px solid var(--atlas-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.atlas-shell__wordmark {
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--atlas-text-1);
+}
+.atlas-shell__sep {
+  width: 1px; height: 18px;
+  background: var(--atlas-border-strong);
+  flex-shrink: 0;
+}
+.atlas-shell__path-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+}
+.atlas-shell__path-name {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--atlas-text-1);
+}
+.atlas-shell__controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.atlas-shell__ctrl-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+  margin-right: 2px;
+}
+
+/* gallery annotation bar below header */
+.atlas-shell__annotation {
+  background: #fffbeb;
+  border-bottom: 1px solid #fde68a;
+  padding: 7px 20px;
+  font-size: var(--text-sm);
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PATH FLOW STAGE
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-stage {
+  overflow-y: auto;
+  padding: 20px 20px 40px;
+}
+
+.atlas-section-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--atlas-text-3);
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--atlas-border);
+}
+.atlas-section-note {
+  font-size: var(--text-sm);
+  color: var(--atlas-text-2);
+  margin: -6px 0 14px;
+}
+
+.atlas-flow {
+  display: flex;
+  gap: var(--col-gap);
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: 4px 4px 20px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ATLAS COLUMN CARD
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-col {
+  width: var(--col-w);
+  flex-shrink: 0;
+  border-radius: var(--col-radius);
+  border: var(--col-border-w) solid var(--col-ctx-border, #15263d);
+  background: linear-gradient(180deg, var(--col-ctx-tint, #f4f6fa) 0%, #ffffff 100%);
+  box-shadow: var(--col-shadow);
+  padding: var(--col-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+/* Context modifiers */
+.atlas-col--lifecycle {
+  --col-ctx-border: var(--ctx-lifecycle-border);
+  --col-ctx-tint:   var(--ctx-lifecycle-tint);
+}
+.atlas-col--runtime {
+  --col-ctx-border: var(--ctx-runtime-border);
+  --col-ctx-tint:   var(--ctx-runtime-tint);
+}
+.atlas-col--ux {
+  --col-ctx-border: var(--ctx-ux-border);
+  --col-ctx-tint:   var(--ctx-ux-tint);
+}
+.atlas-col--business {
+  --col-ctx-border: var(--ctx-business-border);
+  --col-ctx-tint:   var(--ctx-business-tint);
+}
+/* 2x expanded column */
+.atlas-col--2x {
+  width: calc(var(--col-w) * 2 + var(--col-gap));
+}
+
+/* ── Column header ─────────────────────────────────────────────────────────── */
+.atlas-col__header {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.atlas-col__class-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+/* kind badge always right-aligns on whichever line it lands on */
+.atlas-col__class-row > .atlas-badge--kind {
+  margin-left: auto;
+}
+.atlas-col__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.atlas-col__step {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-text-4);
+  white-space: nowrap;
+  margin-top: 1px;
+}
+.atlas-col__title {
+  margin: 2px 0 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--atlas-text-1);
+}
+.atlas-col__desc {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.32;
+  color: var(--atlas-text-2);
+}
+
+/* ── Screen thumbnail zone ─────────────────────────────────────────────────── */
+.atlas-col__screen-zone {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 2px;
+}
+
+/* ── Model zone (entity boxes) ─────────────────────────────────────────────── */
+.atlas-col__model-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── GWT zone ──────────────────────────────────────────────────────────────── */
+.atlas-col__gwt-zone {
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(100, 116, 139, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.atlas-col__gwt-zone--collapsed {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* GWT clauses (when expanded) */
+.atlas-gwt-clause {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: start;
+  gap: 6px;
+}
+.atlas-gwt-stage {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border-radius: var(--badge-radius-tag);
+  background: #cbd5e1;
+  border: 1px solid #bfcad7;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1e293b;
+  white-space: nowrap;
+}
+.atlas-gwt-ref {
+  border-radius: 9px;
+  border: 1px solid var(--atlas-border-strong);
+  background: rgba(255,255,255,0.78);
+  padding: 3px 7px 4px;
+  font-size: var(--text-xs);
+  line-height: 1.28;
+  color: var(--atlas-text-1);
+  font-weight: 600;
+}
+.atlas-gwt-ref--command { background: rgba(59,130,246,0.10); border-color: var(--cmd-border); }
+.atlas-gwt-ref--event   { background: rgba(249,115,22,0.10); border-color: var(--evt-border); }
+.atlas-gwt-ref--view    { background: rgba(34,197,94,0.10);  border-color: var(--view-border); }
+.atlas-gwt-ref__sub {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 400;
+  color: var(--atlas-text-3);
+  margin-top: 1px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   BADGES (self-contained so gallery is standalone)
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm); font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; line-height: 1;
+  padding: 4px 8px 2px; /* asymmetric: uppercase glyphs sit high in the em square */
+  border-radius: var(--badge-radius-pill);
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.atlas-badge--group   { background: #0f172a; color: #fff; }
+.atlas-badge--context { background: rgba(255,255,255,0.94); color: var(--atlas-text-1); border-color: var(--atlas-border-strong); }
+.atlas-badge--lens    { background: rgba(255,255,255,0.80); color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.atlas-badge--kind    { border-radius: var(--badge-radius-tag); background: #cbd5e1; color: #1e293b; border-color: #bfcad7; font-size: var(--text-2xs); letter-spacing: 0.08em; padding: 4px 6px 2px; }
+.atlas-badge--kind-command { background: #dbeafe; color: #1e3a8a; border-color: var(--cmd-border); }
+.atlas-badge--kind-view    { background: #dcfce7; color: #14532d; border-color: var(--view-border); }
+.atlas-badge--actor        { background: #eff6ff; color: #1e3a8a; border-color: #bfdbfe; }
+.atlas-badge--actor-system { background: #f8fafc; color: var(--atlas-text-2); border-color: var(--atlas-border); }
+.atlas-badge--status       { border-radius: var(--badge-radius-tag); font-size: var(--text-2xs); padding: 4px 6px 2px; }
+.atlas-badge--specified    { background: #dcfce7; color: #166534; border-color: var(--view-border); }
+.atlas-badge--draft        { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+.atlas-badge--nospec       { background: #f1f5f9; color: var(--atlas-text-3); border-color: var(--atlas-border); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ENTITY BOXES
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-entity {
+  border-radius: var(--box-radius);
+  border: 2px solid;
+  overflow: hidden;
+}
+.atlas-entity--command { background: var(--cmd-bg);  border-color: var(--cmd-border);  }
+.atlas-entity--event   { background: var(--evt-bg);  border-color: var(--evt-border);  }
+.atlas-entity--view    { background: var(--view-bg); border-color: var(--view-border); }
+
+.atlas-entity__header {
+  padding: 3px 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.atlas-entity--command .atlas-entity__header { background: var(--cmd-header);  }
+.atlas-entity--event   .atlas-entity__header { background: var(--evt-header);  }
+.atlas-entity--view    .atlas-entity__header { background: var(--view-header); }
+
+.atlas-entity__type {
+  font-size: var(--text-2xs); font-weight: 700;
+  letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+}
+.atlas-entity__name {
+  padding: 6px 8px 5px;
+  font-size: var(--text-base); font-weight: 700; line-height: 1.2;
+  color: var(--atlas-text-1);
+}
+.atlas-entity__fields {
+  margin: 0; padding: 0 8px 7px; list-style: none;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.atlas-entity__field {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs); line-height: 1.4;
+  color: var(--atlas-text-2);
+}
+.atlas-entity__field-value { color: var(--atlas-text-3); font-weight: 400; }
+/* 2x: lay out fields in two columns */
+.atlas-col--2x .atlas-entity__fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 12px; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THUMBNAILS
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-thumb {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  cursor: pointer;
+}
+.atlas-thumb__device {
+  width: 68px; border-radius: 13px;
+  border: 1.5px solid var(--atlas-border-strong);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15,23,42,0.12);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: box-shadow 120ms;
+}
+.atlas-thumb:hover .atlas-thumb__device { box-shadow: 0 6px 18px rgba(15,23,42,0.18); }
+.atlas-thumb__notch {
+  width: 22px; height: 3px; border-radius: 999px;
+  background: var(--atlas-border-strong);
+  align-self: center; margin: 4px 0 2px; flex-shrink: 0;
+}
+.atlas-thumb__screen { display: flex; flex-direction: column; flex: 1; }
+.atlas-thumb__bar { height: 9px; flex-shrink: 0; }
+.atlas-thumb__bar--ll { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.atlas-thumb__body {
+  flex: 1; padding: 5px 4px 6px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.atlas-thumb__name {
+  font-size: var(--text-xs); font-weight: 700;
+  letter-spacing: 0.04em; color: var(--atlas-text-2); text-align: center;
+}
+/* abstract content blocks */
+.atlas-thumb__field  { height: 10px; border-radius: 4px; background: #e9eff6; border: 1px solid var(--atlas-border); }
+.atlas-thumb__block  { height: 6px;  border-radius: 3px; background: #e2e8f0; }
+.atlas-thumb__chip-row { display: flex; gap: 2px; }
+.atlas-thumb__chip   { flex: 1; height: 13px; border-radius: 4px; border: 1px solid var(--atlas-border); background: #fff; }
+.atlas-thumb__chip--sel  { background: #fff7ed; border-color: #fdba74; }
+.atlas-thumb__chip--sel2 { background: #ede9fe; border-color: #c4b5fd; }
+.atlas-thumb__btn         { height: 12px; border-radius: 4px; }
+.atlas-thumb__btn--primary  { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.atlas-thumb__btn--success  { background: linear-gradient(135deg, #34d399, #10b981); }
+.atlas-thumb__btn--disabled { background: #e2e8f0; }
+.atlas-thumb__summary-bar { height: 14px; border-radius: 4px; background: #fff7ed; border: 1px solid #fdba74; }
+.atlas-thumb__card  { height: 16px; border-radius: 4px; background: #fff; border: 1px solid var(--atlas-border); border-left: 3px solid var(--atlas-border-strong); }
+.atlas-thumb__card--logged { border-left-color: #86efac; }
+.atlas-thumb__price-row { display: flex; align-items: center; gap: 3px; }
+.atlas-thumb__price-sym { width: 8px; height: 12px; border-radius: 2px; background: #94a3b8; }
+.atlas-thumb__price-val { flex: 1; height: 12px; border-radius: 3px; border: 1px solid var(--atlas-border); background: #fff; }
+
+/* No-screen state */
+.atlas-thumb--none .atlas-thumb__device {
+  border-style: dashed; background: var(--atlas-bg);
+  box-shadow: none; align-items: center; justify-content: center;
+  min-height: 82px; gap: 4px;
+}
+.atlas-thumb--none:hover .atlas-thumb__device { box-shadow: none; }
+.atlas-thumb__none-icon  { font-size: 1.4rem; color: var(--atlas-text-4); }
+.atlas-thumb__none-label { font-size: var(--text-2xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--atlas-text-4); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LENS TOGGLE
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-lens-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 28px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--atlas-border-strong);
+  background: var(--atlas-surface); color: var(--atlas-text-2);
+  font-family: var(--font-sans); font-size: var(--text-sm);
+  font-weight: 700; letter-spacing: 0.04em; cursor: pointer;
+  transition: all 100ms ease;
+}
+.atlas-lens-btn.is-active {
+  background: var(--atlas-text-1); border-color: var(--atlas-text-1); color: #fff;
+}
+.atlas-lens-btn.is-active[data-lens="lifecycle"] { background: var(--ctx-lifecycle-border); border-color: var(--ctx-lifecycle-border); }
+.atlas-lens-btn.is-active[data-lens="runtime"]   { background: var(--ctx-runtime-border);   border-color: var(--ctx-runtime-border);   }
+.atlas-lens-btn.is-active[data-lens="ux"]        { background: var(--ctx-ux-border);        border-color: var(--ctx-ux-border);        }
+.atlas-lens-btn.is-active[data-lens="aem"]       { background: var(--ctx-business-border);  border-color: var(--ctx-business-border);  }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TEXT SIZE BUTTONS
+─────────────────────────────────────────────────────────────────────────── */
+.atlas-size-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 26px; min-width: 30px; padding: 0 7px;
+  border-radius: 6px; border: 1px solid var(--atlas-border-strong);
+  background: var(--atlas-surface); color: var(--atlas-text-2);
+  font-family: var(--font-sans); font-size: var(--text-sm);
+  font-weight: 700; letter-spacing: 0.04em; cursor: pointer;
+  transition: all 100ms ease;
+}
+.atlas-size-btn.is-active {
+  background: var(--atlas-text-1); border-color: var(--atlas-text-1); color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FLOW CONNECTOR (arrow between columns — visual time flow)
+───────────────────────────────────────────────────────────────────────────── */
+.atlas-flow-connector {
+  flex-shrink: 0; align-self: center;
+  display: flex; align-items: center; gap: 0;
+  color: var(--atlas-text-4);
+  margin: 0 -6px;
+}
+.atlas-flow-connector__line {
+  width: 12px; height: 2px; background: currentColor;
+}
+.atlas-flow-connector__head {
+  width: 6px; height: 6px;
+  border-top: 2px solid currentColor; border-right: 2px solid currentColor;
+  transform: rotate(45deg); margin-left: -3px;
+}
+</style>
+</head>
+<body>
+<div class="atlas-shell">
+
+  <!-- ── Shell header ──────────────────────────────────────────────────────── -->
+  <header class="atlas-shell__header">
+    <span class="atlas-shell__wordmark">ATLAS</span>
+    <div class="atlas-shell__sep"></div>
+    <span class="atlas-shell__path-eyebrow">LaundryLog · PATH1</span>
+    <span class="atlas-shell__path-name">Fresh Launch — No Location — First Entry</span>
+    <div class="atlas-shell__controls">
+      <span class="atlas-shell__ctrl-label">Lenses</span>
+      <button class="atlas-lens-btn is-active" data-lens="lifecycle" type="button">Lifecycle</button>
+      <button class="atlas-lens-btn is-active" data-lens="runtime"   type="button">Runtime</button>
+      <button class="atlas-lens-btn is-active" data-lens="ux"        type="button">Screen</button>
+      <button class="atlas-lens-btn is-active" data-lens="aem"       type="button">AEM</button>
+      <div class="atlas-shell__sep"></div>
+      <span class="atlas-shell__ctrl-label">Size</span>
+      <button class="atlas-size-btn" data-size="13" type="button">S</button>
+      <button class="atlas-size-btn" data-size="16" type="button">M</button>
+      <button class="atlas-size-btn" data-size="19" type="button">L</button>
+      <button class="atlas-size-btn" data-size="22" type="button">XL</button>
+    </div>
+  </header>
+
+  <div class="atlas-shell__annotation">
+    Gallery prototype · Column types for LaundryLog PATH1 · Hardcoded content — will be driven from *.nexus.md data
+  </div>
+
+  <!-- ── Stage ─────────────────────────────────────────────────────────────── -->
+  <main class="atlas-stage">
+
+    <p class="atlas-section-label">PATH1 — Column flow (all lenses active)</p>
+    <p class="atlas-section-note">Scroll horizontally. Each column = one slice. Border color = concern context.</p>
+
+    <div class="atlas-flow">
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 1 · LaunchApp · ApplicationLifecycle · COMMAND
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--lifecycle" aria-label="LaunchApp slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">App Runtime</span>
+              <span class="atlas-badge atlas-badge--context">ApplicationLifecycle</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">Lifecycle</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 01</div>
+          <h2 class="atlas-col__title">LaunchApp</h2>
+          <p class="atlas-col__desc">Driver taps the app icon. Platform dispatches startup. No app code has run yet.</p>
+        </div>
+
+        <!-- No screen — system-internal until splash -->
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb atlas-thumb--none">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__none-icon">⚡</div>
+              <div class="atlas-thumb__none-label">Pre-UI</div>
+            </div>
+            <span class="atlas-thumb__name">No surface</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">LaunchApp</div>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">AppStarted</div>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--nospec">No spec</span>
+          <span style="font-size:var(--text-xs);color:var(--atlas-text-4)">infrastructure</span>
+        </div>
+
+      </section>
+
+      <div class="atlas-flow-connector" aria-hidden="true">
+        <div class="atlas-flow-connector__line"></div>
+        <div class="atlas-flow-connector__head"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 2 · ResolveStartupRoute · RuntimeOrchestration · COMMAND
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--runtime" aria-label="ResolveStartupRoute slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">App Runtime</span>
+              <span class="atlas-badge atlas-badge--context">RuntimeOrchestration</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">Runtime</span>
+            <span class="atlas-badge atlas-badge--actor-system">System</span>
+          </div>
+          <div class="atlas-col__step">Step 02</div>
+          <h2 class="atlas-col__title">ResolveStartupRoute</h2>
+          <p class="atlas-col__desc">Runtime checks complete. No prior session, no saved location. Route resolves to NeedLocation.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb atlas-thumb--none">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__none-icon">⚙</div>
+              <div class="atlas-thumb__none-label">Internal</div>
+            </div>
+            <span class="atlas-thumb__name">No surface</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">ResolveStartupRoute</div>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">RouteResolved</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">route <span class="atlas-entity__field-value">= NeedLocation</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--nospec">No spec</span>
+          <span style="font-size:var(--text-xs);color:var(--atlas-text-4)">infrastructure</span>
+        </div>
+
+      </section>
+
+      <div class="atlas-flow-connector" aria-hidden="true">
+        <div class="atlas-flow-connector__line"></div>
+        <div class="atlas-flow-connector__head"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 3 · SetLocation · Business · COMMAND
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" aria-label="SetLocation slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">Business</span>
+              <span class="atlas-badge atlas-badge--context">Domain</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">AEM</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 03</div>
+          <h2 class="atlas-col__title">SetLocation</h2>
+          <p class="atlas-col__desc">Driver confirms the laundromat. Location carries as ambient context for all subsequent expenses.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__field"></div>
+                  <div class="atlas-thumb__block" style="width:45%;align-self:flex-start"></div>
+                  <div style="flex:1"></div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">NeedLocation</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">SetLocation</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">location</li>
+            </ul>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">LaundryLocationCaptured</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">location</li>
+              <li class="atlas-entity__field">occurredAt</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+          <button style="font-size:var(--text-xs);color:var(--atlas-text-3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font-sans);">show GWT ↓</button>
+        </div>
+
+      </section>
+
+      <div class="atlas-flow-connector" aria-hidden="true">
+        <div class="atlas-flow-connector__line"></div>
+        <div class="atlas-flow-connector__head"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 4 · MachineTypeSelected · UX · COMMAND
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--ux" aria-label="MachineTypeSelected slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">UX / Interaction</span>
+              <span class="atlas-badge atlas-badge--context">UX</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">Screen</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 04</div>
+          <h2 class="atlas-col__title">MachineTypeSelected</h2>
+          <p class="atlas-col__desc">Driver taps Washer chip. Form adapts to show stepper and unit price input.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__chip-row">
+                    <div class="atlas-thumb__chip atlas-thumb__chip--sel"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                  </div>
+                  <div class="atlas-thumb__block" style="width:60%"></div>
+                  <div class="atlas-thumb__price-row">
+                    <div class="atlas-thumb__price-sym"></div>
+                    <div class="atlas-thumb__price-val"></div>
+                  </div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--disabled"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">EntryForm</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">MachineTypeSelected</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType <span class="atlas-entity__field-value">= Washer</span></li>
+            </ul>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">MachineTypeSelectionChanged</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+          <button style="font-size:var(--text-xs);color:var(--atlas-text-3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font-sans);">show GWT ↓</button>
+        </div>
+
+      </section>
+
+      <div class="atlas-flow-connector" aria-hidden="true">
+        <div class="atlas-flow-connector__line"></div>
+        <div class="atlas-flow-connector__head"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 5 · LogExpense · Business · COMMAND
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" aria-label="LogExpense slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">Business</span>
+              <span class="atlas-badge atlas-badge--context">Domain</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">AEM</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 05</div>
+          <h2 class="atlas-col__title">LogExpense</h2>
+          <p class="atlas-col__desc">Driver logs one expense entry. One entry per machine per payment event.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__chip-row">
+                    <div class="atlas-thumb__chip atlas-thumb__chip--sel"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                  </div>
+                  <div class="atlas-thumb__price-row">
+                    <div class="atlas-thumb__price-sym"></div>
+                    <div class="atlas-thumb__price-val"></div>
+                  </div>
+                  <div class="atlas-thumb__chip-row">
+                    <div class="atlas-thumb__chip atlas-thumb__chip--sel2"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                  </div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">LogExpense</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType</li>
+              <li class="atlas-entity__field">quantity</li>
+              <li class="atlas-entity__field">unitPrice</li>
+              <li class="atlas-entity__field">payment</li>
+            </ul>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">LaundryExpenseLogged</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">location</li>
+              <li class="atlas-entity__field">machineType</li>
+              <li class="atlas-entity__field">lineTotal</li>
+              <li class="atlas-entity__field">payment</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+          <button style="font-size:var(--text-xs);color:var(--atlas-text-3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font-sans);">show GWT ↓</button>
+        </div>
+
+      </section>
+
+      <div class="atlas-flow-connector" aria-hidden="true">
+        <div class="atlas-flow-connector__line"></div>
+        <div class="atlas-flow-connector__head"></div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════
+           Col 6 · RecentExpenses · Business · VIEW
+      ══════════════════════════════════════════════════════════════════ -->
+      <section class="atlas-col atlas-col--business" aria-label="RecentExpenses slice">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">Business</span>
+              <span class="atlas-badge atlas-badge--context">Domain</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-view">VIEW</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">AEM</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 06</div>
+          <h2 class="atlas-col__title">RecentExpenses</h2>
+          <p class="atlas-col__desc">Session entries — all expenses within 3-hour gap window. Newest first. UI concept, not stored.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__summary-bar"></div>
+                  <div class="atlas-thumb__card atlas-thumb__card--logged"></div>
+                  <div class="atlas-thumb__card atlas-thumb__card--logged"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">SessionView</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <!-- ViewSlice: events consumed → view produced -->
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">LaundryExpenseLogged</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field" style="color:var(--atlas-text-4);font-style:italic">session window</li>
+            </ul>
+          </div>
+          <div class="atlas-entity atlas-entity--view">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">View</span></div>
+            <div class="atlas-entity__name">RecentExpenses</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">sessionTotal</li>
+              <li class="atlas-entity__field">entries[ ]</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="atlas-col__gwt-zone atlas-col__gwt-zone--collapsed">
+          <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+          <button style="font-size:var(--text-xs);color:var(--atlas-text-3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font-sans);">show GWT ↓</button>
+        </div>
+
+      </section>
+
+    </div><!-- /atlas-flow -->
+
+    <!-- ── GWT Expanded — Col 5 LogExpense at 2x ─────────────────────────── -->
+    <p class="atlas-section-label" style="margin-top:36px;">LogExpense — expanded (2×) with GWT open</p>
+    <p class="atlas-section-note">In-flow expansion. Column widens; entity boxes gain field values; GWT clauses become explicit.</p>
+
+    <div class="atlas-flow">
+
+      <section class="atlas-col atlas-col--business atlas-col--2x" aria-label="LogExpense expanded">
+
+        <div class="atlas-col__header">
+          <div class="atlas-col__class-row">
+            <div class="atlas-col__badges">
+              <span class="atlas-badge atlas-badge--group">Business</span>
+              <span class="atlas-badge atlas-badge--context">Domain</span>
+            </div>
+            <span class="atlas-badge atlas-badge--kind atlas-badge--kind-command">COMMAND</span>
+          </div>
+          <div class="atlas-col__badges" style="margin-top:2px">
+            <span class="atlas-badge atlas-badge--lens">AEM</span>
+            <span class="atlas-badge atlas-badge--actor">Driver</span>
+          </div>
+          <div class="atlas-col__step">Step 05 · expanded</div>
+          <h2 class="atlas-col__title">LogExpense</h2>
+          <p class="atlas-col__desc">Driver logs one expense entry. One entry per machine per payment event.</p>
+        </div>
+
+        <div class="atlas-col__screen-zone">
+          <div class="atlas-thumb">
+            <div class="atlas-thumb__device" style="width:90px;">
+              <div class="atlas-thumb__notch"></div>
+              <div class="atlas-thumb__screen">
+                <div class="atlas-thumb__bar atlas-thumb__bar--ll"></div>
+                <div class="atlas-thumb__body">
+                  <div class="atlas-thumb__chip-row">
+                    <div class="atlas-thumb__chip atlas-thumb__chip--sel"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                  </div>
+                  <div class="atlas-thumb__price-row">
+                    <div class="atlas-thumb__price-sym"></div>
+                    <div class="atlas-thumb__price-val"></div>
+                  </div>
+                  <div class="atlas-thumb__chip-row">
+                    <div class="atlas-thumb__chip atlas-thumb__chip--sel2"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                    <div class="atlas-thumb__chip"></div>
+                  </div>
+                  <div class="atlas-thumb__btn atlas-thumb__btn--primary"></div>
+                </div>
+              </div>
+            </div>
+            <span class="atlas-thumb__name">ReadyToLog</span>
+          </div>
+        </div>
+
+        <div class="atlas-col__model-zone">
+          <div class="atlas-entity atlas-entity--command">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Command</span></div>
+            <div class="atlas-entity__name">LogExpense</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">machineType <span class="atlas-entity__field-value">= Washer</span></li>
+              <li class="atlas-entity__field">quantity    <span class="atlas-entity__field-value">= 1</span></li>
+              <li class="atlas-entity__field">unitPrice   <span class="atlas-entity__field-value">= 3.00</span></li>
+              <li class="atlas-entity__field">payment     <span class="atlas-entity__field-value">= Cash</span></li>
+            </ul>
+          </div>
+          <div class="atlas-entity atlas-entity--event">
+            <div class="atlas-entity__header"><span class="atlas-entity__type">Event</span></div>
+            <div class="atlas-entity__name">LaundryExpenseLogged</div>
+            <ul class="atlas-entity__fields">
+              <li class="atlas-entity__field">location    <span class="atlas-entity__field-value">= "Love's #123 - Springfield, OH"</span></li>
+              <li class="atlas-entity__field">machineType <span class="atlas-entity__field-value">= Washer</span></li>
+              <li class="atlas-entity__field">quantity    <span class="atlas-entity__field-value">= 1</span></li>
+              <li class="atlas-entity__field">unitPrice   <span class="atlas-entity__field-value">= 3.00</span></li>
+              <li class="atlas-entity__field">lineTotal   <span class="atlas-entity__field-value">= 3.00</span></li>
+              <li class="atlas-entity__field">payment     <span class="atlas-entity__field-value">= Cash</span></li>
+              <li class="atlas-entity__field">occurredAt  <span class="atlas-entity__field-value">= (assigned by store)</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- GWT open -->
+        <div class="atlas-col__gwt-zone">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span class="atlas-badge atlas-badge--status atlas-badge--specified">Specified</span>
+            <button style="font-size:var(--text-xs);color:var(--atlas-text-3);background:none;border:none;cursor:pointer;padding:0;font-family:var(--font-sans);">hide GWT ↑</button>
+          </div>
+
+          <div class="atlas-gwt-clause">
+            <span class="atlas-gwt-stage">Given</span>
+            <div class="atlas-gwt-ref atlas-gwt-ref--event">
+              LaundryLocationCaptured
+              <span class="atlas-gwt-ref__sub">location = "Love's #123 - Springfield, OH"</span>
+            </div>
+          </div>
+
+          <div class="atlas-gwt-clause">
+            <span class="atlas-gwt-stage">When</span>
+            <div class="atlas-gwt-ref atlas-gwt-ref--command">
+              LogExpense
+              <span class="atlas-gwt-ref__sub">machineType=Washer · quantity=1 · unitPrice=3.00 · payment=Cash</span>
+            </div>
+          </div>
+
+          <div class="atlas-gwt-clause">
+            <span class="atlas-gwt-stage">Then</span>
+            <div class="atlas-gwt-ref atlas-gwt-ref--event">
+              LaundryExpenseLogged
+              <span class="atlas-gwt-ref__sub">lineTotal=3.00 · payment=Cash</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div><!-- /atlas-flow expanded -->
+
+  </main>
+
+</div>
+
+<script>
+(function () {
+  const html = document.documentElement;
+  const sizeBtns = document.querySelectorAll('.atlas-size-btn');
+
+  function applySize(px) {
+    html.style.fontSize = px + 'px';
+    sizeBtns.forEach(b => b.classList.toggle('is-active', parseInt(b.dataset.size) === px));
+    localStorage.setItem('atlas-gallery-size', px);
+  }
+
+  sizeBtns.forEach(btn => {
+    btn.addEventListener('click', () => applySize(parseInt(btn.dataset.size)));
+  });
+
+  const saved = parseInt(localStorage.getItem('atlas-gallery-size')) || 16;
+  applySize(saved);
+})();
+</script>
+</body>
+</html>
