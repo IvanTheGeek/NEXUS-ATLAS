@@ -164,13 +164,16 @@ body {
   grid-template-columns: var(--col-w);
   grid-auto-columns: var(--col-w);
 
-  /* Named row zones. Each name is a line pair: foo-start / foo-end.           */
+  /* Named row zones.
+     Each adjacent pair of end/start names must be in ONE bracket group —
+     the CSS Grid grammar allows only one <line-names> at each track boundary.
+     [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
-    [header-start]  auto [header-end]
-    [screen-start]  auto [screen-end]
-    [command-start] auto [command-end]
-    [event-start]   auto [event-end]
-    [gwt-start]     auto [gwt-end];
+    [header-start]  auto [header-end  screen-start]
+    auto [screen-end  command-start]
+    auto [command-end event-start]
+    auto [event-end   gwt-start]
+    auto [gwt-end];
 
   column-gap: var(--col-gap);
 
@@ -181,23 +184,28 @@ body {
 /* ══════════════════════════════════════════════════════════════════════════════
    COLUMN CARD
    ─────────────────────────────────────────────────────────────────────────────
-   Each slice is a grid item that spans ALL row zones via subgrid.
-   - grid-row: span the full set of named rows so the card is one visual unit
-   - grid-template-rows: subgrid — inherit parent row tracks so zone children
-     participate in cross-column alignment
-   - The card's border / background / radius live here; zones are its subgrid rows.
+   display:contents removes the column's own box so its zone children become
+   direct grid items of .atlas-flow. This is the fix for the subgrid circular
+   sizing problem: with display:grid+subgrid, the parent's auto row tracks had
+   no single-row items to drive their heights (the single spanning item is what
+   we're trying to size). With display:contents the zones ARE the single-row
+   items, so row heights resolve from real content.
+
+   CSS custom properties (--col-ctx-border, --col-ctx-tint) still inherit
+   through display:contents to the .zone-bg child — cascade is unaffected.
+
+   The card's visual (border, background, shadow, radius) moves to .zone-bg,
+   a background-only div placed first in source order, spanning all rows.
 ══════════════════════════════════════════════════════════════════════════════ */
 .atlas-col {
-  /* Span every row zone — the card is one continuous unit. */
+  display: contents;
+}
+
+/* Visual card background — spans all row zones; sits behind content zones
+   because it comes first in source order (lower stack order by default). */
+.zone-bg {
   grid-row: header-start / gwt-end;
-
-  /* Subgrid: zone children inherit the parent flow's row tracks.
-     When a second column is placed beside this one, their zones
-     automatically equalize height across the row. */
-  display: grid;
-  grid-template-rows: subgrid;
-
-  /* Visual card */
+  grid-column: 1;
   border-radius: var(--col-radius);
   border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
   background: linear-gradient(
@@ -206,7 +214,7 @@ body {
     var(--atlas-surface) 55%
   );
   box-shadow: var(--col-shadow);
-  overflow: hidden;
+  pointer-events: none;
 }
 
 /* Context modifiers — set the card's border color and tint via custom props */
@@ -230,13 +238,17 @@ body {
 /* ══════════════════════════════════════════════════════════════════════════════
    ZONES
    ─────────────────────────────────────────────────────────────────────────────
-   Each zone is a direct subgrid child. They are auto-placed sequentially into
-   the five inherited row tracks (header → screen → command → event → gwt).
-   No explicit grid-row needed unless we need to skip or reorder.
+   Each zone is a direct grid item of .atlas-flow (because .atlas-col uses
+   display:contents). Explicit grid-row + grid-column placement required.
+   grid-column is the slice number — 1 for the first slice, 2 for the second, etc.
+   z-index: 1 ensures zones render above the background .zone-bg layer.
 ══════════════════════════════════════════════════════════════════════════════ */
 
 /* Zone 1 — Header */
 .atlas-col__header {
+  grid-row: header-start / header-end;
+  grid-column: 1;
+  z-index: 1;
   padding: var(--col-pad) var(--col-pad) 8px;
   display: flex;
   flex-direction: column;
@@ -245,6 +257,9 @@ body {
 
 /* Zone 2 — Screen thumbnail */
 .atlas-col__screen {
+  grid-row: screen-start / screen-end;
+  grid-column: 1;
+  z-index: 1;
   padding: 2px var(--col-pad) 8px;
   display: flex;
   justify-content: center;
@@ -253,6 +268,9 @@ body {
 
 /* Zone 3 — Command entity box(es) */
 .atlas-col__command {
+  grid-row: command-start / command-end;
+  grid-column: 1;
+  z-index: 1;
   padding: 0 var(--col-pad) 6px;
   display: flex;
   flex-direction: column;
@@ -262,6 +280,9 @@ body {
 /* Zone 4 — Event entity box(es)
    This zone will eventually expand to multiple row tracks as needed. */
 .atlas-col__event {
+  grid-row: event-start / event-end;
+  grid-column: 1;
+  z-index: 1;
   padding: 0 var(--col-pad) 6px;
   display: flex;
   flex-direction: column;
@@ -270,6 +291,9 @@ body {
 
 /* Zone 5 — GWT (given / when / then) */
 .atlas-col__gwt {
+  grid-row: gwt-start / gwt-end;
+  grid-column: 1;
+  z-index: 1;
   padding: 8px var(--col-pad) var(--col-pad);
   border-top: 1px dashed rgba(100, 116, 139, 0.28);
 }
@@ -521,6 +545,9 @@ body {
            Five direct children → auto-placed into five inherited row zones.
       ════════════════════════════════════════════════════════════════════ -->
       <section class="atlas-col atlas-col--business" aria-label="LogExpense slice">
+
+        <!-- Card visual — spans all rows; behind content zones (first in source order) -->
+        <div class="zone-bg" aria-hidden="true"></div>
 
         <!-- Zone 1: Header — badges, step, title, description -->
         <div class="atlas-col__header">
