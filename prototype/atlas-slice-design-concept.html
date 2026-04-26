@@ -53,7 +53,7 @@
 
   /* Column geometry */
   --col-w:          292px;
-  --actor-col-w:    40px;
+  --actor-col-w:    76px;
   --swim-lane-h:    126px;   /* shared height for every swimlane row above INTERFACE */
   --col-radius:     24px;
   --col-border-w:   4px;
@@ -795,17 +795,38 @@ body {
   justify-content: center;
 }
 
-.actor-lane--driver-mobile {
-  grid-row: driver-mobile-start / driver-mobile-end;
+.actor-lane--driver {
+  grid-row: driver-start / driver-end;
   background: var(--swim-driver-bg);
   border-right: 2px solid #93c5fd;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
-.actor-lane--driver-desktop {
-  grid-row: driver-desktop-start / driver-desktop-end;
-  background: var(--swim-driver-bg);
-  border-right: 2px solid #93c5fd;
-  border-top: 1px solid rgba(147, 197, 253, 0.55);
+.actor-lane--driver > .actor-lane__group {
+  width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid rgba(147, 197, 253, 0.40);
+}
+
+.actor-lane--driver > .actor-lane__sub-lanes {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.actor-lane__sub-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actor-lane__sub-item + .actor-lane__sub-item {
+  border-top: 1px solid rgba(147, 197, 253, 0.50);
 }
 
 .actor-lane--admin {
@@ -840,8 +861,7 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.actor-lane--driver-mobile  .actor-lane__label { color: #1e40af; }
-.actor-lane--driver-desktop .actor-lane__label { color: #1e40af; }
+.actor-lane--driver .actor-lane__label { color: #1e40af; }
 .actor-lane--admin   .actor-lane__label { color: #92400e; }
 .actor-lane--restapi .actor-lane__label { color: #0f766e; text-transform: none; letter-spacing: 0.06em; }
 .actor-lane--cli     .actor-lane__label { color: #334155; }
@@ -1227,11 +1247,18 @@ body {
 
       <!-- Actor column — grid col 1, sticky on horizontal scroll ─────────── -->
       <div class="actor-bg" aria-hidden="true"></div>
-      <div class="actor-lane actor-lane--driver-mobile" aria-label="Mobile driver swimlane">
-        <span class="actor-lane__label">Mobile</span>
-      </div>
-      <div class="actor-lane actor-lane--driver-desktop" aria-label="Desktop driver swimlane">
-        <span class="actor-lane__label">Desktop</span>
+      <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">Driver</span>
+        </div>
+        <div class="actor-lane__sub-lanes">
+          <div class="actor-lane__sub-item">
+            <span class="actor-lane__label">Mobile</span>
+          </div>
+          <div class="actor-lane__sub-item">
+            <span class="actor-lane__label">Desktop</span>
+          </div>
+        </div>
       </div>
       <div class="actor-lane actor-lane--admin" aria-label="Admin swimlane">
         <span class="actor-lane__label">ADMIN</span>
