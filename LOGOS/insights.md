@@ -137,6 +137,23 @@ appear misaligned. When a visual inspection raises an alignment concern, verify 
 If `label.center_y === item.center_y` the alignment is correct regardless of how the
 screenshot renders it. Trust measurements over visuals when they disagree.
 
+## Flex Items Default to `min-width: auto`
+
+Flex items have `min-width: auto` by default, which means they will not shrink below their
+min-content width even when the container is smaller. A label inside a narrow flex column
+will hold the column open rather than truncate or wrap as expected.
+
+Fix: set `min-width: 0` on the flex item to allow it to shrink freely. This is a silent
+failure mode — the column appears not to resize without any console error.
+
+```css
+/* WRONG — flex item holds open to its text's min-content width */
+.sub-lane { display: flex; align-items: center; justify-content: center; }
+
+/* CORRECT — allow shrinking below min-content */
+.sub-lane { display: flex; align-items: center; justify-content: center; min-width: 0; }
+```
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
