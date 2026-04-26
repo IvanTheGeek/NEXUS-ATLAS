@@ -819,12 +819,14 @@ body {
 .actor-lane--driver > .actor-lane__sub-lanes {
   flex: 1;
   align-self: stretch;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .actor-lane__sub-item {
-  flex: 1;
+  height: var(--swim-lane-h);
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -850,6 +852,12 @@ body {
   grid-row: cli-start / cli-end;
   background: var(--swim-cli-bg);
   border-right: 2px solid #64748b;
+}
+
+.actor-lane--interface {
+  grid-row: interface-start / interface-end;
+  background: var(--atlas-bg);
+  border-right: 2px solid var(--atlas-border-strong);
 }
 
 .actor-lane--system {
@@ -1280,6 +1288,7 @@ body {
           <span class="actor-lane__label">CLI</span>
         </div>
       </div>
+      <div class="actor-lane actor-lane--interface" aria-hidden="true"></div>
       <div class="actor-lane actor-lane--system" aria-label="System swimlane">
         <div class="actor-lane__group">
           <span class="actor-lane__label">System</span>
