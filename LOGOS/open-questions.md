@@ -53,3 +53,22 @@ PATH B starts where PATH A ends. How is the chain boundary represented? A visual
 
 **Pattern recognition**
 Translation patterns and external process patterns are structural shapes in the slice graph. Does ATLAS detect and label these automatically, or does the modeler annotate them manually? What does a pattern look like visually in the column flow?
+
+## Event Taxonomy / LaundryLog Domain
+
+**Session model: derived vs. explicit**
+If sessions are always derived (3-hour gap rule), `LaundrySessionStarted/Closed` never exist as events. If the driver can explicitly close a session or start a new one at the same location, they become real durable events.
+Decision needed before implementing session-aware projections.
+
+**`LaundryLocationUpdated` vs repeated `LaundryLocationCaptured`**
+Using the same event for first-set and mid-session location change is simpler but loses signal. Distinct events allow queries like "how many times did this driver change locations in one outing." However, a single event type with a sequence number or `isUpdate` flag could also work.
+Decision needed before finalizing the event stream shape.
+
+**Correction semantics: edit vs. history**
+`LaundryExpenseCorrected` as an immutable append keeps the stream honest. The question is whether the UI exposes this as "edit" (hides the correction event) or "history" (shows it). The event model can support either — this is a lens/projection choice — but the UI contract needs to be decided.
+
+**`AppStarted` / `RouteResolved` — domain events or PATH scaffolding?**
+These are in PATH1 but may be scaffolding for the PATH walkthrough rather than true LaundryLog domain events. If ATLAS needs to show them in a timeline, they stay. If they are PATH sequencing notation only, they should be modeled differently or excluded from the domain event catalog.
+
+**SubDomain name for location identity**
+Location identity matching (resolving free-text to a canonical place, e.g. "Love's #123" → a specific GPS-located stop) is richer than just "Location." The SubDomain may need its own name (e.g., "Identity", "LocationRegistry", "PlaceResolution") if the concept grows into a distinct bounded context.
