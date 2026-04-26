@@ -389,9 +389,9 @@ body {
   grid-column: 1 / -1;
   pointer-events: none;
 }
-.lane-band--driver  { grid-row: driver-start  / driver-end;  background: rgba(239, 246, 255, 0.45); }
-.lane-band--restapi { grid-row: restapi-start / restapi-end; background: rgba(238, 242, 255, 0.45); }
-.lane-band--cli     { grid-row: cli-start     / cli-end;     background: rgba(15,  23,  42,  0.04); }
+.lane-band--driver  { grid-row: driver-start  / driver-end;  background: rgba(219, 234, 254, 0.35); }
+.lane-band--restapi { grid-row: restapi-start / restapi-end; background: rgba(243, 232, 255, 0.35); }
+.lane-band--cli     { grid-row: cli-start     / cli-end;     background: rgba(30,  41,  59,  0.05); }
 .lane-band--system  { grid-row: system-start  / system-end;  background: rgba(248, 250, 252, 0.70); }
 
 /* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
@@ -464,20 +464,20 @@ body {
 
 .actor-lane--driver {
   grid-row: driver-start / driver-end;
-  background: rgba(239, 246, 255, 0.80);
-  border-right: 2px solid #bfdbfe;
+  background: rgba(219, 234, 254, 0.80);   /* blue-200 */
+  border-right: 2px solid #93c5fd;
 }
 
 .actor-lane--restapi {
   grid-row: restapi-start / restapi-end;
-  background: rgba(238, 242, 255, 0.80);
-  border-right: 2px solid #c7d2fe;
+  background: rgba(243, 232, 255, 0.80);   /* purple-100 */
+  border-right: 2px solid #d8b4fe;
 }
 
 .actor-lane--cli {
   grid-row: cli-start / cli-end;
-  background: rgba(15, 23, 42, 0.06);
-  border-right: 2px solid #475569;
+  background: rgba(30, 41, 59, 0.10);      /* slate-800 tint */
+  border-right: 2px solid #64748b;
 }
 
 .actor-lane--system {
@@ -494,9 +494,9 @@ body {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.actor-lane--driver  .actor-lane__label { color: #1e3a8a; }
-.actor-lane--restapi .actor-lane__label { color: #3730a3; text-transform: none; letter-spacing: 0.06em; }
-.actor-lane--cli     .actor-lane__label { color: #475569; }
+.actor-lane--driver  .actor-lane__label { color: #1e40af; }
+.actor-lane--restapi .actor-lane__label { color: #7e22ce; text-transform: none; letter-spacing: 0.06em; }
+.actor-lane--cli     .actor-lane__label { color: #334155; }
 .actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
