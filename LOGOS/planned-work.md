@@ -19,7 +19,7 @@ Goal: get the design right in HTML/CSS before building in F#. Each prototype pag
 - [ ] Flow/Workflow grouping shown with real LaundryLog example
 - [ ] GWT toggle interaction working (show/hide per column)
 - [ ] Column expand-in-place working (click to 2x, click again to collapse)
-- [ ] Actor swimlane row visible
+- [x] Actor swimlane column visible (sticky left, spans zone rows per actor type)
 
 ### Additional Prototype Pages
 - [ ] PATH Index page — list of available PATHs, entry point into the viewer
