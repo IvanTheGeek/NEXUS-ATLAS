@@ -5,6 +5,12 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cd /home/ivan/nexus/NEXUS-ATLAS && claude --print --allowedTools 'Read,Edit,Write,Glob' -p 'You are maintaining the LOGOS/ documentation directory for the NEXUS-ATLAS project. Review the conversation transcript provided on stdin (JSON). Based on what happened in the latest turn, update the relevant LOGOS/ files: LOGOS/tasks-open.md (active and next tasks), LOGOS/tasks-completed.md (completed items only — append here when tasks are done), LOGOS/planned-work.md (sequenced intentions not yet started), LOGOS/open-questions.md (unresolved design decisions), LOGOS/insights.md (cross-cutting methodology insights). Rules: move completed tasks from tasks-open.md to tasks-completed.md; add new tasks or sub-tasks that emerged; add new open questions; add new insights. Only rewrite files that actually changed. Match the existing style and formatting exactly.' 2>/dev/null; true",
+            "timeout": 60,
+            "statusMessage": "Updating LOGOS docs..."
+          },
+          {
+            "type": "command",
             "command": "cd /home/ivan/nexus/NEXUS-ATLAS && git add -A && git diff --cached --quiet || (git commit -m \"chore: session checkpoint $(date -u +%Y-%m-%dT%H:%M:%SZ)\" && git push -u origin HEAD)"
           }
         ]
