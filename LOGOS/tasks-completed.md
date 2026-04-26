@@ -32,3 +32,4 @@
 - [x] `atlas-slice-design-concept.html` — numeric-only column labels (`01`, `02`) above each card; name text (`LogExpense`) removed — numbers sufficient for design-phase reference
 - [x] `atlas-slice-design-concept.html` — slice 01 shows field-less COMMAND and EVENT entities (name only, no field list); slice 02 retains full field lists — comparison of compact vs. detailed entity rendering
 - [x] `atlas-slice-design-concept.html` — COMMAND and EVENT rows aligned across both slices: each zone is a dedicated shared grid row so the tallest cell drives the height for all columns; GWT alignment was already correct
+- [x] `atlas-slice-design-concept.html` — GWT zone mini-cards: G and T rendered as orange event mini-cards, W as a blue command mini-card; visual language mirrors the full entity boxes above; aligned across both columns via shared grid rows
