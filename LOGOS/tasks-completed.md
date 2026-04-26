@@ -43,3 +43,4 @@
 - [x] `atlas-slice-design-concept.html` — Slice 01 COMMAND banner height made compact (just tall enough for "COMMAND"); "LaundryLog" and "Business.Behavior" rendered in the plain section below the banner
 - [x] `atlas-slice-design-concept.html` — Slice 03 VIEW slice added: green VIEW banner with "LaundryLog / Business.Translation" meta, list-style DRIVER thumbnails showing RecentExpenses screen, `GET /api/recent-expenses` in RestAPI row, `-q recent-expenses` in CLI row, green VIEW entity card in SYSTEM zone, GWT showing Event → Criteria → View; three slices now compare Command / legacy-badge / View side by side
 - [x] `atlas-slice-design-concept.html` — COMMAND and VIEW banner labels nudged down a couple pixels and pulled left from the right edge for better optical positioning within their banners
+- [x] `atlas-slice-design-concept.html` — COMMAND and VIEW banner labels shifted a further 4px right-padding, pulling them further left from the edge
