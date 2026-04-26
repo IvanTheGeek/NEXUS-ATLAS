@@ -172,10 +172,10 @@ body {
      the CSS Grid grammar allows only one <line-names> at each track boundary.
      [foo-end]\n[bar-start] (two groups) is invalid; [foo-end bar-start] is correct. */
   grid-template-rows:
-    [header-start]  auto [header-end  screen-start]
-    auto [screen-end  command-start]
-    auto [command-end event-start]
-    auto [event-end   gwt-start]
+    [header-start]    auto [header-end    driver-start]
+    auto [driver-end   system-start]
+    auto [system-end   entities-start]
+    auto [entities-end gwt-start]
     auto [gwt-end];
 
   column-gap: var(--col-gap);
@@ -260,9 +260,9 @@ body {
   gap: 5px;
 }
 
-/* Zone 2 — Screen thumbnail */
-.atlas-col__screen {
-  grid-row: screen-start / screen-end;
+/* Zone 2 — DRIVER row: screen thumbnail */
+.atlas-col__driver {
+  grid-row: driver-start / driver-end;
   grid-column: 2;
   z-index: 1;
   padding: 2px var(--col-pad) 8px;
@@ -271,21 +271,21 @@ body {
   align-items: flex-start;
 }
 
-/* Zone 3 — Command entity box(es) */
-.atlas-col__command {
-  grid-row: command-start / command-end;
+/* Zone 3 — SYSTEM row: empty for command slices; automation/reactor content for other types */
+.atlas-col__system {
+  grid-row: system-start / system-end;
   grid-column: 2;
   z-index: 1;
-  padding: 0 var(--col-pad) 6px;
+  min-height: 36px;
+  padding: 4px var(--col-pad);
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-/* Zone 4 — Event entity box(es)
-   This zone will eventually expand to multiple row tracks as needed. */
-.atlas-col__event {
-  grid-row: event-start / event-end;
+/* Zone 4 — COMMAND / VIEW entities: command or view entity box(es) */
+.atlas-col__entities {
+  grid-row: entities-start / entities-end;
   grid-column: 2;
   z-index: 1;
   padding: 0 var(--col-pad) 6px;
@@ -334,14 +334,13 @@ body {
 }
 
 .actor-lane--driver {
-  grid-row: screen-start / command-end;
-  background: rgba(239, 246, 255, 0.80); /* actor badge tint */
+  grid-row: driver-start / driver-end;
+  background: rgba(239, 246, 255, 0.80);
   border-right: 2px solid #bfdbfe;
-  border-bottom: 1px dashed var(--atlas-border-strong);
 }
 
 .actor-lane--system {
-  grid-row: event-start / gwt-end;
+  grid-row: system-start / system-end;
   background: rgba(248, 250, 252, 0.80);
   border-right: 2px solid var(--atlas-border);
 }
@@ -666,7 +665,7 @@ body {
         <!-- Card visual — spans all rows; behind content zones (first in source order) -->
         <div class="zone-bg" aria-hidden="true"></div>
 
-        <!-- Zone 1: Header — badges, step, title, description -->
+        <!-- Zone 1: Header — classification badges only -->
         <div class="atlas-col__header">
           <div class="col-class-row">
             <div class="col-badges">
@@ -677,15 +676,11 @@ body {
           </div>
           <div class="col-badges">
             <span class="badge badge--lens">AEM</span>
-            <span class="badge badge--actor">Driver</span>
           </div>
-          <div class="col-step">Step 05</div>
-          <h2 class="col-title">LogExpense</h2>
-          <p class="col-desc">Driver logs one expense entry. One entry per machine per payment event.</p>
         </div>
 
-        <!-- Zone 2: Screen thumbnail -->
-        <div class="atlas-col__screen">
+        <!-- Zone 2: DRIVER row — screen thumbnail -->
+        <div class="atlas-col__driver">
           <div class="thumb">
             <div class="thumb__device">
               <div class="thumb__notch"></div>
@@ -715,8 +710,11 @@ body {
           </div>
         </div>
 
-        <!-- Zone 3: Command entity box(es) -->
-        <div class="atlas-col__command">
+        <!-- Zone 3: SYSTEM row — empty for COMMAND slices -->
+        <div class="atlas-col__system"></div>
+
+        <!-- Zone 4: COMMAND / VIEW entities -->
+        <div class="atlas-col__entities">
           <div class="entity entity--command">
             <div class="entity__header">
               <span class="entity__type">Command</span>
@@ -729,10 +727,6 @@ body {
               <li class="entity__field">payment</li>
             </ul>
           </div>
-        </div>
-
-        <!-- Zone 4: Event entity box(es) — result of the command -->
-        <div class="atlas-col__event">
           <div class="entity entity--event">
             <div class="entity__header">
               <span class="entity__type">Event</span>
