@@ -46,7 +46,7 @@
 
   /* Swimlane colours — shared by actor lanes, zone backgrounds, and lane bands */
   --swim-driver-bg:  rgba(59,  130, 246, 0.14);
-  --swim-restapi-bg: rgba(139, 92,  246, 0.16);
+  --swim-restapi-bg: rgba(13,  148, 136, 0.16);   /* teal-600 — distinct from blue */
   --swim-cli-bg:     rgba(30,  41,  59,  0.08);
   --swim-system-bg:  rgba(248, 250, 252, 0.80);
 
@@ -215,20 +215,31 @@ body {
   display: contents;
 }
 
-/* Visual card background — spans all row zones; sits behind content zones
-   because it comes first in source order (lower stack order by default). */
+/* Visual card background — gradient fill only; no border (border lives on
+   zone-border so it always renders above zone background colours). */
 .zone-bg {
   grid-row: header-start / gwt-end;
   grid-column: 2;
   border-radius: var(--col-radius);
-  border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
   background: linear-gradient(
     180deg,
     var(--col-ctx-tint, var(--ctx-business-tint)) 0%,
     var(--atlas-surface) 55%
   );
-  box-shadow: var(--col-shadow);
   pointer-events: none;
+}
+
+/* Border overlay — same grid placement, higher z-index than zone backgrounds
+   (z-index: 1) so the card border is always visible above swimlane colours. */
+.zone-border {
+  grid-row: header-start / gwt-end;
+  grid-column: 2;
+  border-radius: var(--col-radius);
+  border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
+  box-shadow: var(--col-shadow);
+  background: transparent;
+  pointer-events: none;
+  z-index: 4;
 }
 
 /* Context modifiers — set the card's border color and tint via custom props */
@@ -481,7 +492,7 @@ body {
 .actor-lane--restapi {
   grid-row: restapi-start / restapi-end;
   background: var(--swim-restapi-bg);
-  border-right: 2px solid #d8b4fe;
+  border-right: 2px solid #5eead4;
 }
 
 .actor-lane--cli {
@@ -505,7 +516,7 @@ body {
   text-transform: uppercase;
 }
 .actor-lane--driver  .actor-lane__label { color: #1e40af; }
-.actor-lane--restapi .actor-lane__label { color: #7e22ce; text-transform: none; letter-spacing: 0.06em; }
+.actor-lane--restapi .actor-lane__label { color: #0f766e; text-transform: none; letter-spacing: 0.06em; }
 .actor-lane--cli     .actor-lane__label { color: #334155; }
 .actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
 
@@ -943,6 +954,9 @@ body {
             <button class="gwt-toggle" type="button">show GWT ↓</button>
           </div>
         </div>
+
+        <!-- Border overlay — redraws card border above all zone backgrounds -->
+        <div class="zone-border" aria-hidden="true"></div>
 
       </section>
 
