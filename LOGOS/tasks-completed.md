@@ -48,3 +48,4 @@
 - [x] `atlas-slice-design-concept.html` — Criteria card colour changed from rose to cyan: clearly distinct from navy command blue, event orange, and view green; rose was rejected for error connotation
 - [x] `atlas-slice-design-concept.html` — Criteria card colour changed from cyan to slate grey: header is slate grey, body is light grey-tinted, W pill is grey with near-black text — neutral tone avoids any semantic colour association
 - [x] `atlas-slice-design-concept.html` — Slice 04 added as a copy of Slice 03 (VIEW); visible at right edge; placeholder for next slice type differentiation
+- [x] `atlas-slice-design-concept.html` — Slice 03 VIEW entity card made field-less: shows only the "RecentExpenses" name with no field list — matches the compact entity rendering established in Slice 01
