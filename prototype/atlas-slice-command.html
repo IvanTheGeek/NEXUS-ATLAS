@@ -45,11 +45,13 @@
   --ctx-business-tint:    #f4f6fa;
 
   /* Column geometry */
-  --col-w:        292px;
-  --col-radius:   24px;
-  --col-border-w: 4px;
-  --col-pad:      10px;
-  --col-gap:      18px;
+  --col-w:          292px;
+  --actor-col-w:    40px;
+  --col-radius:     24px;
+  --col-border-w:   4px;
+  --col-pad:        10px;
+  --col-gap:        18px;
+  --stage-pad:      24px;
   --box-radius:   14px;
   --pill-r:       999px;
   --tag-r:        4px;
@@ -130,7 +132,7 @@ body {
    STAGE
 ══════════════════════════════════════════════════════════════════════════════ */
 .stage {
-  padding: 24px;
+  padding: var(--stage-pad);
   overflow: auto;
 }
 
@@ -159,9 +161,10 @@ body {
 .atlas-flow {
   display: grid;
 
-  /* One column for now — becomes repeat(N, var(--col-w)) as slices are added. */
-  /* grid-auto-columns handles overflow when explicit columns are exhausted.    */
-  grid-template-columns: var(--col-w);
+  /* Column 1: actor swimlane column (fixed width, always sticky).
+     Column 2+: slice columns (--col-w each).
+     grid-auto-columns handles slices beyond the explicit template. */
+  grid-template-columns: var(--actor-col-w) var(--col-w);
   grid-auto-columns: var(--col-w);
 
   /* Named row zones.
@@ -177,8 +180,9 @@ body {
 
   column-gap: var(--col-gap);
 
-  /* Padding gives shadow room and keeps columns off the stage edges. */
-  padding: 16px 24px 48px;
+  /* Right/top/bottom padding gives shadow room; left is 0 because the actor
+     column is flush with .stage's content edge (--stage-pad handles the margin). */
+  padding: 16px var(--stage-pad) 48px 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -205,7 +209,7 @@ body {
    because it comes first in source order (lower stack order by default). */
 .zone-bg {
   grid-row: header-start / gwt-end;
-  grid-column: 1;
+  grid-column: 2;
   border-radius: var(--col-radius);
   border: var(--col-border-w) solid var(--col-ctx-border, var(--ctx-business-border));
   background: linear-gradient(
@@ -240,14 +244,15 @@ body {
    ─────────────────────────────────────────────────────────────────────────────
    Each zone is a direct grid item of .atlas-flow (because .atlas-col uses
    display:contents). Explicit grid-row + grid-column placement required.
-   grid-column is the slice number — 1 for the first slice, 2 for the second, etc.
+   grid-column is the slice column number — 2 for the first slice, 3 for the second, etc.
+   (column 1 is always the actor swimlane column)
    z-index: 1 ensures zones render above the background .zone-bg layer.
 ══════════════════════════════════════════════════════════════════════════════ */
 
 /* Zone 1 — Header */
 .atlas-col__header {
   grid-row: header-start / header-end;
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
   padding: var(--col-pad) var(--col-pad) 8px;
   display: flex;
@@ -258,7 +263,7 @@ body {
 /* Zone 2 — Screen thumbnail */
 .atlas-col__screen {
   grid-row: screen-start / screen-end;
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
   padding: 2px var(--col-pad) 8px;
   display: flex;
@@ -269,7 +274,7 @@ body {
 /* Zone 3 — Command entity box(es) */
 .atlas-col__command {
   grid-row: command-start / command-end;
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
   padding: 0 var(--col-pad) 6px;
   display: flex;
@@ -281,7 +286,7 @@ body {
    This zone will eventually expand to multiple row tracks as needed. */
 .atlas-col__event {
   grid-row: event-start / event-end;
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
   padding: 0 var(--col-pad) 6px;
   display: flex;
@@ -292,11 +297,65 @@ body {
 /* Zone 5 — GWT (given / when / then) */
 .atlas-col__gwt {
   grid-row: gwt-start / gwt-end;
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
   padding: 8px var(--col-pad) var(--col-pad);
   border-top: 1px dashed rgba(100, 116, 139, 0.28);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ACTOR SWIMLANE COLUMN
+   ─────────────────────────────────────────────────────────────────────────────
+   Always in grid-column: 1. All elements use position:sticky; left:var(--stage-pad)
+   so the column sticks at the left edge of .stage's content area when the flow
+   scrolls horizontally. Vertical scroll passes through freely.
+
+   .actor-bg      — white surface + right border spanning all rows (background layer)
+   .actor-lane    — swimlane cell with tinted bg + rotated label (foreground layer)
+══════════════════════════════════════════════════════════════════════════════ */
+.actor-bg {
+  grid-row: header-start / gwt-end;
+  grid-column: 1;
+  position: sticky;
+  left: var(--stage-pad);
+  z-index: 2;
+  background: var(--atlas-surface);
+  border-right: 2px solid var(--atlas-border-strong);
+}
+
+.actor-lane {
+  grid-column: 1;
+  position: sticky;
+  left: var(--stage-pad);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actor-lane--driver {
+  grid-row: screen-start / command-end;
+  background: rgba(239, 246, 255, 0.80); /* actor badge tint */
+  border-right: 2px solid #bfdbfe;
+  border-bottom: 1px dashed var(--atlas-border-strong);
+}
+
+.actor-lane--system {
+  grid-row: event-start / gwt-end;
+  background: rgba(248, 250, 252, 0.80);
+  border-right: 2px solid var(--atlas-border);
+}
+
+.actor-lane__label {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.actor-lane--driver .actor-lane__label { color: #1e3a8a; }
+.actor-lane--system .actor-lane__label { color: var(--atlas-text-3); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    HEADER INTERNALS
@@ -586,6 +645,15 @@ body {
   <main class="stage">
 
     <div class="atlas-flow">
+
+      <!-- Actor column — grid col 1, sticky on horizontal scroll ─────────── -->
+      <div class="actor-bg" aria-hidden="true"></div>
+      <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
+        <span class="actor-lane__label">Driver</span>
+      </div>
+      <div class="actor-lane actor-lane--system" aria-label="System swimlane">
+        <span class="actor-lane__label">System</span>
+      </div>
 
       <!-- ════════════════════════════════════════════════════════════════════
            LogExpense · Business · COMMAND slice
