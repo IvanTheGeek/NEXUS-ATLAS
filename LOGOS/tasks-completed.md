@@ -12,4 +12,5 @@
 - [x] Badge padding fix — asymmetric vertical padding (4px top / 2px bottom) for uppercase glyph optical centering — applied to both files
 - [x] `atlas-column-gallery.html` — text size control S/M/L/XL matching design system
 - [x] `atlas-column-gallery.html` — COMMAND badge overflow at XL fixed (flex-wrap + margin-left: auto on kind badge)
-- [ ] 
+- [x] `logos/` renamed to `LOGOS/` via `git mv` (history preserved)
+- [x] Stop hook configured with two-step sequence: (1) LOGOS maintenance via `claude --print` on transcript stdin, (2) git checkpoint commit+push — docs always committed in sync with code
