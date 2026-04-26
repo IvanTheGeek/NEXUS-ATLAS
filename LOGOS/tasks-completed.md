@@ -45,3 +45,4 @@
 - [x] `atlas-slice-design-concept.html` — COMMAND and VIEW banner labels nudged down a couple pixels and pulled left from the right edge for better optical positioning within their banners
 - [x] `atlas-slice-design-concept.html` — COMMAND and VIEW banner labels shifted a further 4px right-padding, pulling them further left from the edge
 - [x] `atlas-slice-design-concept.html` — Slice 03 GWT Criteria card: rose header and rose-tinted background; W pill matches in rose tone — distinct from blue W pills in slices 01 and 02; VIEW slice GWT colour convention (rose=Criteria) established alongside blue=Command W pill
+- [x] `atlas-slice-design-concept.html` — Criteria card colour changed from rose to cyan: clearly distinct from navy command blue, event orange, and view green; rose was rejected for error connotation
