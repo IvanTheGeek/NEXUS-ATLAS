@@ -44,6 +44,12 @@
   --ctx-business-border:  #15263d;
   --ctx-business-tint:    #f4f6fa;
 
+  /* Swimlane colours — shared by actor lanes, zone backgrounds, and lane bands */
+  --swim-driver-bg:  rgba(219, 234, 254, 0.55);
+  --swim-restapi-bg: rgba(243, 232, 255, 0.55);
+  --swim-cli-bg:     rgba(30,  41,  59,  0.08);
+  --swim-system-bg:  rgba(248, 250, 252, 0.80);
+
   /* Column geometry */
   --col-w:          292px;
   --actor-col-w:    40px;
@@ -269,6 +275,7 @@ body {
   grid-row: driver-start / driver-end;
   grid-column: 2;
   z-index: 1;
+  background: var(--swim-driver-bg);
   padding: 2px var(--col-pad) 8px;
   display: flex;
   justify-content: center;
@@ -280,6 +287,7 @@ body {
   grid-row: system-start / system-end;
   grid-column: 2;
   z-index: 1;
+  background: var(--swim-system-bg);
   min-height: 36px;
   padding: 4px var(--col-pad);
   display: flex;
@@ -292,6 +300,7 @@ body {
   grid-row: restapi-start / restapi-end;
   grid-column: 2;
   z-index: 1;
+  background: var(--swim-restapi-bg);
   padding: 6px var(--col-pad) 8px;
   display: flex;
   justify-content: center;
@@ -342,6 +351,7 @@ body {
   grid-row: cli-start / cli-end;
   grid-column: 2;
   z-index: 1;
+  background: var(--swim-cli-bg);
   padding: 6px var(--col-pad) 8px;
   display: flex;
   justify-content: center;
@@ -389,10 +399,10 @@ body {
   grid-column: 1 / -1;
   pointer-events: none;
 }
-.lane-band--driver  { grid-row: driver-start  / driver-end;  background: rgba(219, 234, 254, 0.35); }
-.lane-band--restapi { grid-row: restapi-start / restapi-end; background: rgba(243, 232, 255, 0.35); }
-.lane-band--cli     { grid-row: cli-start     / cli-end;     background: rgba(30,  41,  59,  0.05); }
-.lane-band--system  { grid-row: system-start  / system-end;  background: rgba(248, 250, 252, 0.70); }
+.lane-band--driver  { grid-row: driver-start  / driver-end;  background: var(--swim-driver-bg);  }
+.lane-band--restapi { grid-row: restapi-start / restapi-end; background: var(--swim-restapi-bg); }
+.lane-band--cli     { grid-row: cli-start     / cli-end;     background: var(--swim-cli-bg);     }
+.lane-band--system  { grid-row: system-start  / system-end;  background: var(--swim-system-bg);  }
 
 /* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
 .atlas-col__interface {
@@ -464,25 +474,25 @@ body {
 
 .actor-lane--driver {
   grid-row: driver-start / driver-end;
-  background: rgba(219, 234, 254, 0.80);   /* blue-200 */
+  background: var(--swim-driver-bg);
   border-right: 2px solid #93c5fd;
 }
 
 .actor-lane--restapi {
   grid-row: restapi-start / restapi-end;
-  background: rgba(243, 232, 255, 0.80);   /* purple-100 */
+  background: var(--swim-restapi-bg);
   border-right: 2px solid #d8b4fe;
 }
 
 .actor-lane--cli {
   grid-row: cli-start / cli-end;
-  background: rgba(30, 41, 59, 0.10);      /* slate-800 tint */
+  background: var(--swim-cli-bg);
   border-right: 2px solid #64748b;
 }
 
 .actor-lane--system {
   grid-row: system-start / system-end;
-  background: rgba(248, 250, 252, 0.80);
+  background: var(--swim-system-bg);
   border-right: 2px solid var(--atlas-border);
 }
 
