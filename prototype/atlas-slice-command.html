@@ -175,7 +175,8 @@ body {
   grid-template-rows:
     [header-start]              auto              [header-end        driver-start]
     var(--swim-lane-h)                            [driver-end        restapi-start]
-    var(--swim-lane-h)                            [restapi-end       interface-start]
+    var(--swim-lane-h)                            [restapi-end       cli-start]
+    var(--swim-lane-h)                            [cli-end           interface-start]
     auto                                          [interface-end     system-start]
     auto                                          [system-end        entities-start]
     auto                                          [entities-end      gwt-start]
@@ -336,6 +337,63 @@ body {
   flex-shrink: 0;
 }
 
+/* Zone 2c — CLI row */
+.atlas-col__cli {
+  grid-row: cli-start / cli-end;
+  grid-column: 2;
+  z-index: 1;
+  padding: 6px var(--col-pad) 8px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* CLI terminal line */
+.cli-block {
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  width: 100%;
+  overflow: hidden;
+}
+.cli-prompt {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: #4ade80;
+  flex-shrink: 0;
+}
+.cli-cmd {
+  font-size: var(--t-xs);
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cli-arg { color: #94a3b8; }
+.cli-flag { color: #7dd3fc; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   LANE BANDS
+   ─────────────────────────────────────────────────────────────────────────────
+   First children in .atlas-flow, spanning all columns. They paint behind
+   everything else (document order). In the column-gap between the actor column
+   and each slice card the band color is visible, making swimlane rows readable
+   across all slice columns as the PATH grows.
+══════════════════════════════════════════════════════════════════════════════ */
+.lane-band {
+  grid-column: 1 / -1;
+  pointer-events: none;
+}
+.lane-band--driver  { grid-row: driver-start  / driver-end;  background: rgba(239, 246, 255, 0.45); }
+.lane-band--restapi { grid-row: restapi-start / restapi-end; background: rgba(238, 242, 255, 0.45); }
+.lane-band--cli     { grid-row: cli-start     / cli-end;     background: rgba(15,  23,  42,  0.04); }
+.lane-band--system  { grid-row: system-start  / system-end;  background: rgba(248, 250, 252, 0.70); }
+
 /* Zone 3b — INTERFACE divider: full-width band between DRIVER and SYSTEM rows */
 .atlas-col__interface {
   grid-row: interface-start / interface-end;
@@ -416,6 +474,12 @@ body {
   border-right: 2px solid #c7d2fe;
 }
 
+.actor-lane--cli {
+  grid-row: cli-start / cli-end;
+  background: rgba(15, 23, 42, 0.06);
+  border-right: 2px solid #475569;
+}
+
 .actor-lane--system {
   grid-row: system-start / system-end;
   background: rgba(248, 250, 252, 0.80);
@@ -431,7 +495,8 @@ body {
   text-transform: uppercase;
 }
 .actor-lane--driver  .actor-lane__label { color: #1e3a8a; }
-.actor-lane--restapi .actor-lane__label { color: #3730a3; }
+.actor-lane--restapi .actor-lane__label { color: #3730a3; text-transform: none; letter-spacing: 0.06em; }
+.actor-lane--cli     .actor-lane__label { color: #475569; }
 .actor-lane--system  .actor-lane__label { color: var(--atlas-text-3); }
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -723,6 +788,13 @@ body {
 
     <div class="atlas-flow">
 
+      <!-- Lane bands — first in source order so they paint behind everything.
+           Span all columns; visible in the column-gap between cards. ───────── -->
+      <div class="lane-band lane-band--driver"  aria-hidden="true"></div>
+      <div class="lane-band lane-band--restapi" aria-hidden="true"></div>
+      <div class="lane-band lane-band--cli"     aria-hidden="true"></div>
+      <div class="lane-band lane-band--system"  aria-hidden="true"></div>
+
       <!-- Actor column — grid col 1, sticky on horizontal scroll ─────────── -->
       <div class="actor-bg" aria-hidden="true"></div>
       <div class="actor-lane actor-lane--driver" aria-label="Driver swimlane">
@@ -730,6 +802,9 @@ body {
       </div>
       <div class="actor-lane actor-lane--restapi" aria-label="RestAPI swimlane">
         <span class="actor-lane__label">RestAPI</span>
+      </div>
+      <div class="actor-lane actor-lane--cli" aria-label="CLI swimlane">
+        <span class="actor-lane__label">CLI</span>
       </div>
       <div class="actor-lane actor-lane--system" aria-label="System swimlane">
         <span class="actor-lane__label">System</span>
@@ -796,6 +871,14 @@ body {
           <div class="terminal-block">
             <span class="terminal-method">POST</span>
             <span class="terminal-path">/api/log-expense</span>
+          </div>
+        </div>
+
+        <!-- Zone 2c: CLI row -->
+        <div class="atlas-col__cli">
+          <div class="cli-block">
+            <span class="cli-prompt">$</span>
+            <span class="cli-cmd">./laundrylog-cli <span class="cli-flag">-c</span> log-expense <span class="cli-arg">--machinetype:dryer</span></span>
           </div>
         </div>
 
