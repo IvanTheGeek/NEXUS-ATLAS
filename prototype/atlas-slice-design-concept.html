@@ -286,20 +286,42 @@ body {
   gap: 5px;
 }
 .atlas-col__header--command {
-  background: var(--cmd-header);
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.col-kind-banner {
   border-radius: calc(var(--col-radius) - var(--col-border-w)) calc(var(--col-radius) - var(--col-border-w)) 0 0;
-  padding: 7px var(--col-pad);
-  flex-direction: row;
+  padding: 3px var(--col-pad);
+  display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0;
 }
-.atlas-col__header--command .col-kind-label {
+.col-kind-banner--command { background: var(--cmd-header); }
+.col-kind-banner--view    { background: var(--view-header); }
+.col-kind-label {
   font-size: var(--t-2xs);
   font-weight: 700;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.92);
+}
+.col-meta {
+  padding: 6px var(--col-pad) 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.col-meta__app {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--atlas-text-1);
+}
+.col-meta__concern {
+  font-size: var(--t-xs);
+  font-family: var(--mono);
+  color: var(--atlas-text-2);
 }
 
 /* Column name label — floats above the card, outside zone-bg */
@@ -1330,9 +1352,15 @@ body {
           <span class="col-slice-num">01</span>
         </div>
 
-        <!-- Zone 1: Header — slice kind -->
+        <!-- Zone 1: Header — slice kind + meta -->
         <div class="atlas-col__header atlas-col__header--command">
-          <span class="col-kind-label">Command</span>
+          <div class="col-kind-banner col-kind-banner--command">
+            <span class="col-kind-label">Command</span>
+          </div>
+          <div class="col-meta">
+            <span class="col-meta__app">LaundryLog</span>
+            <span class="col-meta__concern">Business.Behavior</span>
+          </div>
         </div>
 
         <!-- Zone 2a: DRIVER mobile sub-lane -->
