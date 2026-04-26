@@ -93,6 +93,17 @@ If an exception is thrown in code, either:
 Per Scott Wlaschin / Domain Modeling Made Functional: make invalid states unrepresentable.
 Error flow is not a separate modeling concern — it is a signal of modeling gaps.
 
+## Shared CSS Grid for Multi-Column Alignment
+
+When slice columns are placed in a single shared CSS Grid (rather than each column having
+its own independent grid), row heights are determined by the tallest cell across all columns
+in that row. This means COMMAND rows, EVENT rows, and GWT rows stay perfectly aligned
+regardless of how many fields each individual slice has. The layout does the alignment work
+automatically — no per-column height coordination is needed.
+
+This is the correct structural approach for the ATLAS column viewer: one grid, all columns
+as grid children, zone rows defined once at the grid level.
+
 ## CSS Grid Named Line Syntax: One Group Per Boundary
 
 CSS Grid's `<track-list>` grammar allows exactly one `<line-names>?` token at each track

@@ -31,3 +31,4 @@
 - [x] `atlas-slice-design-concept.html` — `colname` zone row added above the card grid; CSS variable `--slice-col` drives per-column positioning so all zones stay row-aligned across both columns
 - [x] `atlas-slice-design-concept.html` — numeric-only column labels (`01`, `02`) above each card; name text (`LogExpense`) removed — numbers sufficient for design-phase reference
 - [x] `atlas-slice-design-concept.html` — slice 01 shows field-less COMMAND and EVENT entities (name only, no field list); slice 02 retains full field lists — comparison of compact vs. detailed entity rendering
+- [x] `atlas-slice-design-concept.html` — COMMAND and EVENT rows aligned across both slices: each zone is a dedicated shared grid row so the tallest cell drives the height for all columns; GWT alignment was already correct
