@@ -792,7 +792,7 @@ body {
   z-index: 3;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .actor-lane--driver {
@@ -803,17 +803,22 @@ body {
   justify-content: flex-start;
 }
 
-.actor-lane--driver > .actor-lane__group {
+.actor-lane__group {
   width: 40px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.actor-lane--driver > .actor-lane__group {
+  align-self: stretch;
   border-right: 1px solid rgba(147, 197, 253, 0.40);
 }
 
 .actor-lane--driver > .actor-lane__sub-lanes {
   flex: 1;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
 }
@@ -1261,16 +1266,24 @@ body {
         </div>
       </div>
       <div class="actor-lane actor-lane--admin" aria-label="Admin swimlane">
-        <span class="actor-lane__label">ADMIN</span>
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">ADMIN</span>
+        </div>
       </div>
       <div class="actor-lane actor-lane--restapi" aria-label="RestAPI swimlane">
-        <span class="actor-lane__label">RestAPI</span>
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">RestAPI</span>
+        </div>
       </div>
       <div class="actor-lane actor-lane--cli" aria-label="CLI swimlane">
-        <span class="actor-lane__label">CLI</span>
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">CLI</span>
+        </div>
       </div>
       <div class="actor-lane actor-lane--system" aria-label="System swimlane">
-        <span class="actor-lane__label">System</span>
+        <div class="actor-lane__group">
+          <span class="actor-lane__label">System</span>
+        </div>
       </div>
 
       <!-- ════════════════════════════════════════════════════════════════════
