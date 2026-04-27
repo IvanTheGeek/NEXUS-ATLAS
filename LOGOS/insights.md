@@ -236,6 +236,34 @@ Three events cover the entire business:
 
 Everything else — totals, location breakdowns, payment method breakdowns — is a read model projecting off these three. Location management (`LocationAdded`, etc.) is supporting infrastructure. `paymentMethod` lives on the line item events because the notebook confirms it varies within a single visit.
 
+## Bridge Views: Read Models That Feed Commands
+
+In the C→V→C cadence, most views exist to inform a human actor — they are terminal outputs.
+A **bridge view** is structurally different: it exists primarily to supply context to the next
+command, not to present information directly to a user.
+
+`KnownLocations` in LaundryLog is the canonical example. Without it sitting between location
+management and expense logging, the expense commands have nowhere to get their location context
+from. It is the only view in the model whose primary consumer is a command, not a person.
+
+Recognising bridge views matters for ATLAS layout and for FORGE: a bridge view is part of the
+command's precondition, not the user's output. It should be placed between the command that
+produces its source event and the command it enables — its position in the cadence is structural,
+not decorative.
+
+## Repeated View Slots in Cadence
+
+The same view can and should appear multiple times in the C→V→C cadence when multiple adjacent
+commands update the same projection. `CurrentSessionExpenses` appears after `LogWasherExpense`,
+after `LogDryerExpense`, and after `PurchaseSupplies` — three slots, one view.
+
+This is the normal and correct representation on an Event Model board. Each occurrence is the
+same projection updated by one more accumulated event. The user reads the same view, decides
+whether they are done or whether there is another command to issue, and that decision drives the
+next C. The repetition in the cadence encodes the feedback loop — it is not redundancy.
+
+Adam's boards regularly show the same view in multiple columns for exactly this reason.
+
 ## Promotion Candidates → NEXUS-LOGOS
 
 The following insights are candidates for promotion to NEXUS-LOGOS/docs/ when mature:
